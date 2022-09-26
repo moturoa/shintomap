@@ -168,6 +168,9 @@ shintoMapModule <- function(input, output, session,
 
           } else if(lay$geom == "Polygons"){
 
+
+            if(is.null(lay$weight))weight <- 1 else weight <- lay$weight
+
             map <- map %>%
               leaflet::clearGroup(lay$group) %>%
               leaflet::addPolygons(data = lay$data,
@@ -176,10 +179,28 @@ shintoMapModule <- function(input, output, session,
                           group = lay$group,
                           color = color_outline,
                           label = label_function(lay$data, params = label_params),
-                          weight = 1,
+                          weight = weight,
                           fillOpacity = lay$data$FILL_OPACITY)
 
-          } else if(lay$geom == "GlPoints"){
+          } else if(lay$geom == "GlPolygons"){
+
+            map <- map %>%
+              leaflet::clearGroup(lay$group) %>%
+              leafgl::addGlPolygons(data = lay$data,
+                                   layerId = lay$data[[lay$id_column]],
+                                   fillColor = lay$data$FILL_COLOR,
+                                   group = lay$group,
+                                   color = color_outline,
+                                   label = label_function(lay$data, params = label_params),
+                                   weight = 1,
+                                   fillOpacity = lay$data$FILL_OPACITY)
+
+          }
+
+
+
+
+          else if(lay$geom == "GlPoints"){
 
             map <- map %>%
               leaflet::clearGroup(lay$group) %>%
