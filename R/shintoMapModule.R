@@ -37,7 +37,7 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 #' @param border_color Color of border outline
 #' @importFrom shiny renderPrint reactiveValuesToList isolate outputOptions
 #' @importFrom leaflet leaflet renderLeaflet leafletProxy clearGroup addPolygons fitBounds addCircleMarkers
-#' @importFrom leaflet addLegend removeControl setView
+#' @importFrom leaflet addLegend removeControl setView addPolylines
 #' @importFrom sf st_bbox
 #' @importFrom shiny observe reactiveVal observeEvent
 #' @importFrom leafgl addGlPoints
@@ -76,8 +76,6 @@ shintoMapModule <- function(input, output, session,
     # Use shintoBaseMap to make the static leaflet map (with map tiles and a view)
     map <- base_map
 
-    print("BASE")
-
     # Border
     border_data <- shiny::isolate(border())
 
@@ -107,8 +105,10 @@ shintoMapModule <- function(input, output, session,
   shiny::observe({
 
     border_data <- border()
+    ui_ping()
     shiny::req(border_data)
     shiny::req(nrow(border_data) > 0)
+
     bb <- unname(sf::st_bbox(border_data))
 
     map <- leaflet::leafletProxy("map") %>%
@@ -137,7 +137,6 @@ shintoMapModule <- function(input, output, session,
     shiny::observe({
 
       ui_ping()
-print("LAYER")
       lay <- layer()
 
       if(is.null(lay) || is.null(lay$data) || nrow(lay$data) == 0){
@@ -205,6 +204,17 @@ print("LAYER")
                           label = label_function(lay$data, params = label_params),
                           weight = weight,
                           fillOpacity = lay$data$FILL_OPACITY)
+
+          } else if(lay$geom == "Polylines"){
+
+            map <- map %>%
+              leaflet::clearGroup(lay$group) %>%
+              leaflet::addPolylines(data = lay$data,
+                                    #layerId = lay$data[[lay$id_column]],
+                                    stroke = TRUE, weight = 2,
+                                    color = "red",
+                                    group = lay$group,
+                                    label = label_function(lay$data, params = label_params))
 
           } else if(lay$geom == "GlPolygons"){
 
