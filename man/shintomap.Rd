@@ -12,6 +12,7 @@ shintoMapModule(
   output,
   session,
   base_map,
+  render_not_visible = TRUE,
   border = shiny::reactive(NULL),
   border_weight = 2,
   border_color = "#4f4f4f",
@@ -23,6 +24,25 @@ shintoMapModule(
   toggle_reload = shiny::reactive(TRUE),
   layers = list()
 )
+}
+\arguments{
+\item{input}{shiny input, do not set}
+
+\item{output}{shiny output, do not set}
+
+\item{session}{shiny session, do not set}
+
+\item{base_map}{Static map (with tiles and view setting) made with [shintoBaseMap()]}
+
+\item{render_not_visible}{If TRUE, renders the map even when not visible. Works in tabsetpanels (tab_box),
+but does not work in modals! For modals, set render_not_visible = FALSE (map should be rendered only after
+the modal is opened)}
+
+\item{border}{Reactive sf dataframe with a polygon used as a border}
+
+\item{border_weight}{Thickness of border polygon}
+
+\item{border_color}{Color of border outline}
 }
 \description{
 Shinto Map modules

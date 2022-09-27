@@ -25,6 +25,16 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 
 #' @export
 #' @rdname shintomap
+#' @param input shiny input, do not set
+#' @param output shiny output, do not set
+#' @param session shiny session, do not set
+#' @param base_map Static map (with tiles and view setting) made with [shintoBaseMap()]
+#' @param render_not_visible If TRUE, renders the map even when not visible. Works in tabsetpanels (tab_box),
+#' but does not work in modals! For modals, set render_not_visible = FALSE (map should be rendered only after
+#' the modal is opened)
+#' @param border Reactive sf dataframe with a polygon used as a border
+#' @param border_weight Thickness of border polygon
+#' @param border_color Color of border outline
 #' @importFrom shiny renderPrint reactiveValuesToList isolate outputOptions
 #' @importFrom leaflet leaflet renderLeaflet leafletProxy clearGroup addPolygons fitBounds addCircleMarkers
 #' @importFrom leaflet addLegend removeControl setView
@@ -33,6 +43,8 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 #' @importFrom leafgl addGlPoints
 shintoMapModule <- function(input, output, session,
                       base_map,
+
+                      render_not_visible = TRUE,
 
                       border = shiny::reactive(NULL),
                       border_weight = 2,
@@ -54,12 +66,17 @@ shintoMapModule <- function(input, output, session,
     shiny::reactiveValuesToList(input)
   })
 
+
+  ui_ping <- reactiveVal()
+
   output$map <- leaflet::renderLeaflet({
 
     toggle_reload()
 
     # Use shintoBaseMap to make the static leaflet map (with map tiles and a view)
     map <- base_map
+
+    print("BASE")
 
     # Border
     border_data <- shiny::isolate(border())
@@ -74,12 +91,17 @@ shintoMapModule <- function(input, output, session,
                     color = border_color)
     }
 
+    ui_ping(runif(1))
+
     map
 
   })
 
   # Bug fix: map does not load on an unselected tab
-  shiny::outputOptions(output, "map", suspendWhenHidden = FALSE)
+  if(render_not_visible){
+    shiny::outputOptions(output, "map", suspendWhenHidden = FALSE)
+  }
+
 
   # Reactive border data
   shiny::observe({
@@ -114,6 +136,8 @@ shintoMapModule <- function(input, output, session,
 
     shiny::observe({
 
+      ui_ping()
+print("LAYER")
       lay <- layer()
 
       if(is.null(lay) || is.null(lay$data) || nrow(lay$data) == 0){
