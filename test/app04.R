@@ -1,28 +1,29 @@
 
 
-
-# Example app with map in a modal, using softui::modalize,
-# and the code for the map (ui+server) in a shiny module.
-# Bug avoidance: see ca. line 114. Without this adjustment, the map loads
-# the first time the modal is opened, but not the second time.
-# Map has to be reloaded every time the modal is triggered...
-
+# Example app with map on tab1, filters on tab2.
+# this has caused bugs in the past (I believe)
+# this works fine though
+# Another 'bug' happens with two layers, one on (toggled), one off, and accidentally
+# given the same 'group' name to both layers!
+# group shouldn't have to be input name?
 
 library(shiny)
 library(softui)
 library(leaflet)
+library(shinyWidgets)
 
 devtools::load_all()
 
-
 geo <- readRDS("geo_Eindhoven.rds")
-
+buurt_locaties <- sf::st_centroid(geo$buurten)
 
 mymapui <- function(id){
   ns <- NS(id)
 
   tags$div(
-    shintoMapUI(ns("map"), height = 800)
+     materialSwitch(ns("tog1"), "Toggle Area", value = TRUE),
+     materialSwitch(ns("tog2"), "Toggle Points", value = FALSE),
+     shintoMapUI(ns("map"), height = 800)
   )
 
 }
@@ -45,7 +46,7 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
   callModule(shintoMapModule, "map",
              base_map = my_base_map,
-             render_not_visible = FALSE, # for use in modal!
+             render_not_visible = TRUE, # for use in modal!
              border = reactive(geo$grens),
              label_function = function(data,...)data$bu_naam,
              ...,
@@ -57,11 +58,12 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
                  list(
                    data = map_data(),
-                   toggle = TRUE,
+                   toggle = input$tog1,
                    group = "area_layer",
                    geom = "Polygons",
                    id_column = "bu_code",
                    color_column = "a_inw",
+                   stroke = FALSE,
 
                    color_function = list(
                      palfunction = "shinto_auto_color",
@@ -78,6 +80,19 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
                  )
 
+               ),
+
+               reactive(
+
+                 list(
+                   data = buurt_locaties,
+                   toggle = input$tog2,
+                   group = "point_layer",
+                   geom = "CircleMarkers",
+                   id_column = "bu_code"
+
+                 )
+
                )
 
              )
@@ -86,15 +101,19 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 }
 
 
-
-
-
 ui <- softui::simple_page(
-  softui::box(title = "shintomap", icon = bsicon("geo-alt-fill"), width = 6,
+  softui::tab_box(width = 6,
+    softui::tab_panel(
+      title = "shintomap", icon = bsicon("geo-alt-fill"),
+      mymapui("map")
+    ),
+    softui::tab_panel(
+      title = "filters", icon = bsicon("filter"),
+      softui::virtual_select_input("sel_buurt", "Buurten", multiple = TRUE, choices= geo$buurten$bu_naam)
+    )
 
-              softui::action_button("btn_show_map", "Toon kaart", status = "info"),
-              softui::virtual_select_input("sel_buurt", "Buurten", multiple = TRUE, choices= geo$buurten$bu_naam)
   )
+
 )
 
 server <- function(input, output, session) {
@@ -109,12 +128,7 @@ server <- function(input, output, session) {
   })
 
 
-    softui::modalize(trigger_open = reactive(input$btn_show_map),
-                     ui_module = mymapui,
-                     server_module = mymapserver, size = "l",
-                     server_pars = list(map_data = buurten_data,
-                                        toggle_reload = reactive(input$btn_show_map)))  # BUG avoid!!
-
+  callModule(mymapserver, "map", map_data = buurten_data)
 
 
 }

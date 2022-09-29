@@ -128,9 +128,17 @@ shintoMapModule <- function(input, output, session,
 
   })
 
-
   map <- leaflet::leafletProxy("map")
 
+  group_names <- reactive({
+    sapply(layers, function(layer)layer()$group)
+  })
+
+  observeEvent(group_names(), {
+    if(any(duplicated(group_names()))){
+      stop("Duplicate group names in layers in shintomap, fix please!")
+    }
+  })
 
   lapply(layers, function(layer){
 
@@ -138,6 +146,8 @@ shintoMapModule <- function(input, output, session,
 
       ui_ping()
       lay <- layer()
+
+      lay <- validate_map_layer(lay)
 
       if(is.null(lay) || is.null(lay$data) || nrow(lay$data) == 0){
 
@@ -185,14 +195,12 @@ shintoMapModule <- function(input, output, session,
                                color = lay$data$FILL_COLOR,
                                radius = lay$radius,
                                group = lay$group,
+                               stroke = lay$stroke,
                                weight = lay$weight,
                                label = label_function(lay$data, params = label_params),
                                fillOpacity = lay$data$FILL_OPACITY)
 
           } else if(lay$geom == "Polygons"){
-
-
-            if(is.null(lay$weight))weight <- 1 else weight <- lay$weight
 
             map <- map %>%
               leaflet::clearGroup(lay$group) %>%
@@ -200,9 +208,10 @@ shintoMapModule <- function(input, output, session,
                           layerId = lay$data[[lay$id_column]],
                           fillColor = lay$data$FILL_COLOR,
                           group = lay$group,
+                          stroke = lay$stroke,
                           color = color_outline,
                           label = label_function(lay$data, params = label_params),
-                          weight = weight,
+                          weight = lay$weight,
                           fillOpacity = lay$data$FILL_OPACITY)
 
           } else if(lay$geom == "Polylines"){
@@ -210,9 +219,10 @@ shintoMapModule <- function(input, output, session,
             map <- map %>%
               leaflet::clearGroup(lay$group) %>%
               leaflet::addPolylines(data = lay$data,
-                                    #layerId = lay$data[[lay$id_column]],
-                                    stroke = TRUE, weight = 2,
-                                    color = "red",
+                                    layerId = lay$data[[lay$id_column]],
+                                    stroke = lay$stroke,
+                                    weight = lay$weight,
+                                    color = lay$data$FILL_COLOR,
                                     group = lay$group,
                                     label = label_function(lay$data, params = label_params))
 
@@ -226,15 +236,11 @@ shintoMapModule <- function(input, output, session,
                                    group = lay$group,
                                    color = color_outline,
                                    label = label_function(lay$data, params = label_params),
-                                   weight = 1,
+                                   weight = lay$weight,
+                                   stroke = lay$stroke,
                                    fillOpacity = lay$data$FILL_OPACITY)
 
-          }
-
-
-
-
-          else if(lay$geom == "GlPoints"){
+          } else if(lay$geom == "GlPoints"){
 
             map <- map %>%
               leaflet::clearGroup(lay$group) %>%
