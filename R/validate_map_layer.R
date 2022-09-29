@@ -7,13 +7,6 @@ validate_map_layer <- function(layer){
     keys <- names(layer)
     have <- function(x)x %in% keys
 
-    # Reset group to avoid bug with duplicate group name.
-    # if(have("group")){
-    #   message("No need to set 'group' in shintomap layer definition")
-    # }
-    #
-    # layer$group <- random_id()
-
     # layerId not always needed, but I think it crashes without it
     if(!have("id_column")){
       message("Set id_column in shintomap to process map clicks")

@@ -18,7 +18,7 @@ binned_numeric_map_color(
 \arguments{
 \item{vals}{A numeric vector}
 
-\item{palette_function}{A palette function from the `pals` package}
+\item{palette_function}{A palette function from the \code{pals} package}
 
 \item{method}{If bin, cuts the numeric vector in equal parts. If quantile,
 cuts it in equal quantile parts (so that each bin contains ca. equal number of observations)}

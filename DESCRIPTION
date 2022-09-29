@@ -6,8 +6,10 @@ Author: Remko Duursma
 Maintainer: Remko Duursma <remko@shintolabs.nl>
 Description: Standard interactive Shinto map based on leaflet. Replaces
     old 'leafletModule'. Make anything interactive. Add multiple layers.
+    Color by attributes, automatic legends.
 Depends: magrittr
 Imports: leaflet, htmltools, shiny, leafgl, glue
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.1
+Roxygen: list(markdown = TRUE)

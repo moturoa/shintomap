@@ -2,9 +2,12 @@
 
 #----- UI -------
 
-#' Shinto Map modules
+#' Shinto Map UI Module
+#' @param id Shiny ID for the module
+#' @param debugger_panel If TRUE, add a verbatimtextoutput panel showing all shiny input values, handy for debugging
+#' @param \dots Further arguments passed to [leafletOutput()], such as `height`, `width`
+#' @seealso [shintoMapModule()]
 #' @export
-#' @rdname shintomap
 #' @importFrom shiny NS verbatimTextOutput reactive
 #' @importFrom leaflet leafletOutput
 shintoMapUI <- function(id, debugger_panel = FALSE, ...){
@@ -23,8 +26,7 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 }
 
 
-#' @export
-#' @rdname shintomap
+#' Shinto Map server module
 #' @param input shiny input, do not set
 #' @param output shiny output, do not set
 #' @param session shiny session, do not set
@@ -35,12 +37,20 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 #' @param border Reactive sf dataframe with a polygon used as a border
 #' @param border_weight Thickness of border polygon
 #' @param border_color Color of border outline
+#' @param auto_recenter If TRUE, zooms to area when the border changes (reactively)
+#' @param label_function Function (with `data` and `...` as arguments) to make labels. Optional.
+#' @param label_params List of further arguments to pass to `label_function`
+#' @param color_default Default (fill) color if color is not computed for the layer
+#' @param color_outline Fixed color of the outline of polygons
+#' @param toggle_reload Reactive to trigger a reload of the map. Sometimes necessary, such as in modals.
+#' @param layers List of reactives (each with a list of settings). See example apps.
 #' @importFrom shiny renderPrint reactiveValuesToList isolate outputOptions
 #' @importFrom leaflet leaflet renderLeaflet leafletProxy clearGroup addPolygons fitBounds addCircleMarkers
 #' @importFrom leaflet addLegend removeControl setView addPolylines
 #' @importFrom sf st_bbox
 #' @importFrom shiny observe reactiveVal observeEvent
 #' @importFrom leafgl addGlPoints
+#' @export
 shintoMapModule <- function(input, output, session,
                       base_map,
 
