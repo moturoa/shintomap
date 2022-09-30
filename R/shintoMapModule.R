@@ -222,6 +222,7 @@ shintoMapModule <- function(input, output, session,
                           color = color_outline,
                           label = label_function(lay$data, params = label_params),
                           weight = lay$weight,
+                          highlightOptions = lay$highlightOptions,
                           fillOpacity = lay$data$FILL_OPACITY)
 
           } else if(lay$geom == "Polylines"){
