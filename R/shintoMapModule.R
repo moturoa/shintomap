@@ -14,8 +14,31 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 
   ns <- shiny::NS(id)
 
+  id_map <- ns("map")
+
   shiny::tagList(
-    leaflet::leafletOutput(ns("map"), ...),
+
+    # Idee hiervan is dat de kaart altijd opnieuw wordt gerenderd als deze
+    # zichtbaar wordt, om de grijze kaart bug te vermijden.
+    # werkt alleen niet helemaal lekker, en geeft extra knipperende kaarten,
+    # niet wenselijk
+    # zie ook a)
+    # tags$script(glue::glue("
+    #
+    #   $(document.body).click( function() {
+    #             const id = '<<<id_map>>>';
+    #     let id_out = id+'_visible';
+    #     let element = document.getElementById(id);
+    #     let viz = $(element).is(':visible');
+    #
+    #     Shiny.setInputValue(id_out, viz);
+    #   });
+    #
+    #
+    #
+    # ", .open = "<<<", .close = ">>>")),
+
+    leaflet::leafletOutput(id_map, ...),
     if(debugger_panel){
       shiny::verbatimTextOutput(ns("txt_out"))
     }
@@ -82,6 +105,9 @@ shintoMapModule <- function(input, output, session,
   output$map <- leaflet::renderLeaflet({
 
     toggle_reload()
+
+    # zie a)
+    #input$map_visible
 
     # Use shintoBaseMap to make the static leaflet map (with map tiles and a view)
     map <- base_map

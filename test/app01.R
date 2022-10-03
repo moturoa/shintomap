@@ -12,11 +12,18 @@ geo <- readRDS("geo_Eindhoven.rds")
 ui <- softui::simple_page(
   softui::box(title = "shintomap", icon = bsicon("geo-alt-fill"), width = 6,
 
-              shintoMapUI("map", height = 800)
+              shintoMapUI("map", height = 800),
+
+              verbatimTextOutput("txt_out")
               )
 )
 
 server <- function(input, output, session) {
+
+  output$txt_out <- renderPrint({
+    reactiveValuesToList(input)
+  })
+
 
   my_base_map <- shintoBaseMap(set_view = list(
     lng = 5.463155,
@@ -24,9 +31,11 @@ server <- function(input, output, session) {
     zoom = 12
   )) %>%
   addEasyButtonBar(
-    map_easy_button(session$ns("btn_help"), icon_file = "question-circle-fill.svg",
+    map_easy_button(session$ns("btn_help"),
+                    icon_file = "question-circle-fill.svg",
                     label = "Click here for help"),
-    map_easy_button(session$ns("btn_fill_color"), icon_file = "palette-fill.svg",
+    map_easy_button(session$ns("btn_fill_color"),
+                    icon_file = "palette-fill.svg",
                     label = "Kleuren instellingen")
   )
 
