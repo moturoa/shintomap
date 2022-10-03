@@ -23,20 +23,20 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
     # werkt alleen niet helemaal lekker, en geeft extra knipperende kaarten,
     # niet wenselijk
     # zie ook a)
-    # tags$script(glue::glue("
-    #
-    #   $(document.body).click( function() {
-    #             const id = '<<<id_map>>>';
-    #     let id_out = id+'_visible';
-    #     let element = document.getElementById(id);
-    #     let viz = $(element).is(':visible');
-    #
-    #     Shiny.setInputValue(id_out, viz);
-    #   });
-    #
-    #
-    #
-    # ", .open = "<<<", .close = ">>>")),
+    tags$script(glue::glue("
+
+      $(document.body).click( function() {
+                const id = '<<<id_map>>>';
+        let id_out = id+'_visible';
+        let element = document.getElementById(id);
+        let viz = $(element).is(':visible');
+
+        Shiny.setInputValue(id_out, viz);
+      });
+
+
+
+    ", .open = "<<<", .close = ">>>")),
 
     leaflet::leafletOutput(id_map, ...),
     if(debugger_panel){
@@ -112,18 +112,18 @@ shintoMapModule <- function(input, output, session,
     # Use shintoBaseMap to make the static leaflet map (with map tiles and a view)
     map <- base_map
 
-    # Border
-    border_data <- shiny::isolate(border())
-
-    if(!is.null(border_data)){
-      map <- map %>%
-        leaflet::addPolygons(data = border_data,
-                    group = "grens",
-                    fill = FALSE,
-                    stroke = TRUE,
-                    weight = border_weight,
-                    color = border_color)
-    }
+    # # Border
+    # border_data <- shiny::isolate(border())
+    #
+    # if(!is.null(border_data)){
+    #   map <- map %>%
+    #     leaflet::addPolygons(data = border_data,
+    #                 group = "grens",
+    #                 fill = FALSE,
+    #                 stroke = TRUE,
+    #                 weight = border_weight,
+    #                 color = border_color)
+    # }
 
     ui_ping(runif(1))
 
@@ -137,32 +137,7 @@ shintoMapModule <- function(input, output, session,
   }
 
 
-  # Reactive border data
-  shiny::observe({
 
-    border_data <- border()
-    ui_ping()
-    shiny::req(border_data)
-    shiny::req(nrow(border_data) > 0)
-
-    bb <- unname(sf::st_bbox(border_data))
-
-    map <- leaflet::leafletProxy("map") %>%
-      leaflet::clearGroup("grens") %>%
-      leaflet::addPolygons(data = border_data,
-                  group = "grens",
-                  fill = FALSE,
-                  stroke = TRUE,
-                  weight = border_weight,
-                  color = border_color)
-
-    if(auto_recenter){
-      map <- map %>% leaflet::fitBounds(bb[1], bb[2], bb[3], bb[4])
-    }
-
-    map
-
-  })
 
   map <- leaflet::leafletProxy("map")
 
@@ -176,11 +151,60 @@ shintoMapModule <- function(input, output, session,
     }
   })
 
+  # Every time either is invalidated, draw near ran nr
+  render_map_raw <- reactive({
+
+    input$map_visible
+    ui_ping()
+
+    runif(1)
+  })
+
+  # now throttle it
+  render_map <- throttle(render_map_raw, 1000)
+
+
+  # Reactive border data
+  shiny::observe({
+
+    #input$map_visible
+    #ui_ping()
+    render_map()
+    border_data <- border()
+
+    shiny::req(border_data)
+    shiny::req(nrow(border_data) > 0)
+
+    bb <- unname(sf::st_bbox(border_data))
+
+    map <- leaflet::leafletProxy("map") %>%
+      leaflet::clearGroup("grens") %>%
+      leaflet::addPolygons(data = border_data,
+                           group = "grens",
+                           fill = FALSE,
+                           stroke = TRUE,
+                           weight = border_weight,
+                           color = border_color)
+
+    if(auto_recenter){
+      map <- map %>% leaflet::fitBounds(bb[1], bb[2], bb[3], bb[4])
+    }
+
+    map
+
+  })
+
+
   lapply(layers, function(layer){
 
     shiny::observe({
 
-      ui_ping()
+      #input$map_visible
+      #ui_ping()
+
+      render_map()
+
+
       lay <- layer()
 
       lay <- validate_map_layer(lay)
