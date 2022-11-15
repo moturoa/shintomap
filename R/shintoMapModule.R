@@ -18,27 +18,8 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 
   shiny::tagList(
 
-    # Idee hiervan is dat de kaart altijd opnieuw wordt gerenderd als deze
-    # zichtbaar wordt, om de grijze kaart bug te vermijden.
-    # werkt alleen niet helemaal lekker, en geeft extra knipperende kaarten,
-    # niet wenselijk
-    # zie ook a)
-    # tags$script(glue::glue("
-    #
-    #   $(document.body).click( function() {
-    #             const id = '<<<id_map>>>';
-    #     let id_out = id+'_visible';
-    #     let element = document.getElementById(id);
-    #     let viz = $(element).is(':visible');
-    #
-    #     Shiny.setInputValue(id_out, viz);
-    #   });
-    #
-    #
-    #
-    # ", .open = "<<<", .close = ">>>")),
-
     leaflet::leafletOutput(id_map, ...),
+
     if(debugger_panel){
       shiny::verbatimTextOutput(ns("txt_out"))
     }
@@ -91,6 +72,7 @@ shintoMapModule <- function(input, output, session,
                       color_outline = "#FFFFFF",
 
                       toggle_reload = shiny::reactive(TRUE), # complete map reloaden
+                      proxy = TRUE,
                       layers = list()){
 
 
@@ -105,9 +87,6 @@ shintoMapModule <- function(input, output, session,
   output$map <- leaflet::renderLeaflet({
 
     toggle_reload()
-
-    # zie a)
-    #input$map_visible
 
     # Use shintoBaseMap to make the static leaflet map (with map tiles and a view)
     map <- base_map
@@ -127,6 +106,20 @@ shintoMapModule <- function(input, output, session,
 
     ui_ping(runif(1))
 
+
+    if(!proxy){
+
+      for(i in seq_along(layers)){
+
+        lay <- layers[[i]]()
+        map <- add_map_layer(map, lay, color_default, color_outline, label_function)
+      }
+
+      if(auto_recenter){
+        map <- map %>% leaflet::fitBounds(bb[1], bb[2], bb[3], bb[4])
+      }
+    }
+
     map
 
   })
@@ -138,33 +131,38 @@ shintoMapModule <- function(input, output, session,
 
 
   # Reactive border data
-  shiny::observe({
+  if(proxy){
 
-    border_data <- border()
-    ui_ping()
-    shiny::req(border_data)
-    shiny::req(nrow(border_data) > 0)
+    shiny::observe({
 
-    bb <- unname(sf::st_bbox(border_data))
+      border_data <- border()
+      ui_ping()
+      shiny::req(border_data)
+      shiny::req(nrow(border_data) > 0)
 
-    map <- leaflet::leafletProxy("map") %>%
-      leaflet::clearGroup("grens") %>%
-      leaflet::addPolygons(data = border_data,
-                  group = "grens",
-                  fill = FALSE,
-                  stroke = TRUE,
-                  weight = border_weight,
-                  color = border_color)
+      bb <- unname(sf::st_bbox(border_data))
 
-    if(auto_recenter){
-      map <- map %>% leaflet::fitBounds(bb[1], bb[2], bb[3], bb[4])
-    }
+      map <- leaflet::leafletProxy("map") %>%
+        leaflet::clearGroup("grens") %>%
+        leaflet::addPolygons(data = border_data,
+                             group = "grens",
+                             fill = FALSE,
+                             stroke = TRUE,
+                             weight = border_weight,
+                             color = border_color)
 
-    map
+      if(auto_recenter){
+        map <- map %>% leaflet::fitBounds(bb[1], bb[2], bb[3], bb[4])
+      }
 
-  })
+      map
 
-  map <- leaflet::leafletProxy("map")
+    })
+
+  }
+
+
+
 
   group_names <- reactive({
     sapply(layers, function(layer)layer()$group)
@@ -176,160 +174,26 @@ shintoMapModule <- function(input, output, session,
     }
   })
 
-  lapply(layers, function(layer){
 
-    shiny::observe({
+  if(proxy){
 
-      ui_ping()
-      lay <- layer()
+    map <- leaflet::leafletProxy("map")
 
-      lay <- validate_map_layer(lay)
+    lapply(layers, function(layer){
 
-      if(is.null(lay) || is.null(lay$data) || nrow(lay$data) == 0){
+      shiny::observe({
 
-        if(is.null(lay$group))lay$group <- "none"
+        ui_ping()
+        lay <- layer()
 
-        map <- map %>%
-          leaflet::clearGroup(lay$group) %>%
-          leaflet::removeControl(paste0(lay$group,"_color_fill_legend"))
+        map <- add_map_layer(map, lay, color_default, color_outline, label_function)
 
-      } else {
+      })
 
-
-        # No function to compute colors given; the column contains colors.
-        if(is.null(lay$color_function)){
-
-          if(is.null(lay$color_column)){
-            color <- color_default  # single color for everything (fallback)
-          } else {
-            color <- lay$data[[lay$color_column]]   # or, color is present in the data as a column
-          }
-          lay$data$FILL_COLOR <- color
-          lay$data$FILL_OPACITY <- lay$opacity
-
-        } else {  # or, a function has been provided to make the colors
-
-          # Compute colors, add a Legend
-          col_fun_name <- lay$color_function$palfunction
-          opt <- lay$color_function[-1]
-          opt$vals <- lay$data[[lay$color_column]]
-          p_color_fun <- do.call(base::get(col_fun_name), opt)
-
-          lay$data$FILL_COLOR <- p_color_fun(lay$data[[lay$color_column]])
-          lay$data$FILL_OPACITY <- opt$opacity
-
-        }
-
-        if(lay$toggle){
-
-          if(lay$geom == "CircleMarkers"){
-
-            map <- map %>%
-              leaflet::clearGroup(lay$group) %>%
-              leaflet::addCircleMarkers(data = lay$data,
-                               layerId = lay$data[[lay$id_column]],
-                               color = lay$data$FILL_COLOR,
-                               radius = lay$radius,
-                               group = lay$group,
-                               stroke = lay$stroke,
-                               weight = lay$weight,
-                               label = label_function(lay$data, params = label_params),
-                               fillOpacity = lay$data$FILL_OPACITY)
-
-          } else if(lay$geom == "Polygons"){
-
-            map <- map %>%
-              leaflet::clearGroup(lay$group) %>%
-              leaflet::addPolygons(data = lay$data,
-                          layerId = lay$data[[lay$id_column]],
-                          fillColor = lay$data$FILL_COLOR,
-                          group = lay$group,
-                          stroke = lay$stroke,
-                          color = color_outline,
-                          label = label_function(lay$data, params = label_params),
-                          weight = lay$weight,
-                          highlightOptions = lay$highlightOptions,
-                          fillOpacity = lay$data$FILL_OPACITY)
-
-          } else if(lay$geom == "Polylines"){
-
-            map <- map %>%
-              leaflet::clearGroup(lay$group) %>%
-              leaflet::addPolylines(data = lay$data,
-                                    layerId = lay$data[[lay$id_column]],
-                                    stroke = lay$stroke,
-                                    weight = lay$weight,
-                                    color = lay$data$FILL_COLOR,
-                                    group = lay$group,
-                                    label = label_function(lay$data, params = label_params))
-
-          } else if(lay$geom == "GlPolygons"){
-
-            map <- map %>%
-              leaflet::clearGroup(lay$group) %>%
-              leafgl::addGlPolygons(data = lay$data,
-                                   layerId = lay$data[[lay$id_column]],
-                                   fillColor = lay$data$FILL_COLOR,
-                                   group = lay$group,
-                                   color = color_outline,
-                                   label = label_function(lay$data, params = label_params),
-                                   weight = lay$weight,
-                                   stroke = lay$stroke,
-                                   fillOpacity = lay$data$FILL_OPACITY)
-
-          } else if(lay$geom == "GlPoints"){
-
-            map <- map %>%
-              leaflet::clearGroup(lay$group) %>%
-              leafgl::addGlPoints(data = lay$data,
-                                  layerId = lay$data[[lay$id_column]],
-                                  fillColor = lay$data$FILL_COLOR,
-                                  fillOpacity = lay$data$FILL_OPACITY,
-                                  radius = lay$radius,
-                                  group = lay$group)
-
-          }
-
-        } else {
-          map <- map %>%
-            leaflet::clearGroup(lay$group)
-        }
-
-
-        if(isTRUE(lay$legend$toggle) && lay$toggle){
-
-          if(is.numeric(lay$data[[lay$color_column]])){   # !color_col %in% force_factor &
-            brk <- attributes(p_color_fun)$colorArgs$bins
-
-            labs <- paste(brk[1:(length(brk)-1)], brk[2:length(brk)], sep = " - ")
-            brk <- brk[-length(brk)]  # last one is the max, not a bin
-          } else {
-            brk <- levels(as.factor(lay$data[[lay$color_column]]))
-            labs <- brk
-          }
-
-          legend_cols <- p_color_fun(brk)
-
-          map <- map %>% leaflet::removeControl(paste0(lay$group,"_color_fill_legend")) %>%
-            leaflet::addLegend(colors = legend_cols,
-                      labels = labs,
-                      title = lay$legend$title,
-                      layerId = paste0(lay$group,"_color_fill_legend"),
-                      #group = lay$group,
-                      opacity = lay$legend$opacity,
-                      position = lay$legend$position
-            )
-
-        } else {
-          map <- map %>% leaflet::removeControl(paste0(lay$group,"_color_fill_legend"))
-        }
-
-      }
-
-      map
     })
 
-  })
+  }
+
 
   clicked_id <- shiny::reactiveVal()
 

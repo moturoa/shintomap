@@ -19,6 +19,7 @@ shintoMapModule(
   color_default = "#023e8a",
   color_outline = "#FFFFFF",
   toggle_reload = shiny::reactive(TRUE),
+  proxy = TRUE,
   layers = list()
 )
 }
