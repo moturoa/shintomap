@@ -1,7 +1,7 @@
 #' Add map layers
 #' @export
 #' @importFrom leaflet addProviderTiles addTiles addWMSTiles WMSTileOptions addLayersControl
-addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas"){
+addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas", position = "topright"){
 
   tiles <- c(
     "Kaart - grijs (ESRI)" = "Esri.WorldGrayCanvas",
@@ -37,7 +37,8 @@ addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas"){
     leaflet::addLayersControl(baseGroups = c(names(tiles),
                                     "Standaard NL (PDOK BRT)",
                                     "Luchtfoto Actueel (PDOK)",
-                                    "Kadastrale kaart"))
+                                    "Kadastrale kaart"),
+                              position = position)
 
   map
 }

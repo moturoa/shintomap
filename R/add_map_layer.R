@@ -116,35 +116,40 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
     }
 
 
-    val_for_color <- lay$data[[lay$color_column]]
+    if(!is.null(lay$color_column)){
 
-    if(isTRUE(lay$legend$toggle) && lay$toggle && !all(is.na(val_for_color))){
+      val_for_color <- lay$data[[lay$color_column]]
 
-      if(is.numeric(val_for_color)){   # !color_col %in% force_factor &
-        brk <- attributes(p_color_fun)$colorArgs$bins
+      if(isTRUE(lay$legend$toggle) && lay$toggle && !all(is.na(val_for_color))){
 
-        labs <- paste(brk[1:(length(brk)-1)], brk[2:length(brk)], sep = " - ")
-        brk <- brk[-length(brk)]  # last one is the max, not a bin
+        if(is.numeric(val_for_color)){   # !color_col %in% force_factor &
+          brk <- attributes(p_color_fun)$colorArgs$bins
+
+          labs <- paste(brk[1:(length(brk)-1)], brk[2:length(brk)], sep = " - ")
+          brk <- brk[-length(brk)]  # last one is the max, not a bin
+        } else {
+          brk <- levels(as.factor(val_for_color))
+          labs <- brk
+        }
+
+        legend_cols <- p_color_fun(brk)
+
+        map <- map %>% leaflet::removeControl(paste0(lay$group,"_color_fill_legend")) %>%
+          leaflet::addLegend(colors = legend_cols,
+                             labels = labs,
+                             title = lay$legend$title,
+                             layerId = paste0(lay$group,"_color_fill_legend"),
+                             #group = lay$group,
+                             opacity = lay$legend$opacity,
+                             position = lay$legend$position
+          )
+
       } else {
-        brk <- levels(as.factor(val_for_color))
-        labs <- brk
+        map <- map %>% leaflet::removeControl(paste0(lay$group,"_color_fill_legend"))
       }
 
-      legend_cols <- p_color_fun(brk)
-
-      map <- map %>% leaflet::removeControl(paste0(lay$group,"_color_fill_legend")) %>%
-        leaflet::addLegend(colors = legend_cols,
-                           labels = labs,
-                           title = lay$legend$title,
-                           layerId = paste0(lay$group,"_color_fill_legend"),
-                           #group = lay$group,
-                           opacity = lay$legend$opacity,
-                           position = lay$legend$position
-        )
-
-    } else {
-      map <- map %>% leaflet::removeControl(paste0(lay$group,"_color_fill_legend"))
     }
+
 
   }
 

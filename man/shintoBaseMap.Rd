@@ -4,7 +4,12 @@
 \alias{shintoBaseMap}
 \title{Makes a leaflet map for use in shintoMapModule}
 \usage{
-shintoBaseMap(set_view = NULL, ...)
+shintoBaseMap(
+  set_view = NULL,
+  fullscreen_option = FALSE,
+  layers_button_position = "topright",
+  ...
+)
 }
 \description{
 Makes a leaflet map for use in shintoMapModule

@@ -4,7 +4,11 @@
 \alias{addShintoMapLayers}
 \title{Add map layers}
 \usage{
-addShintoMapLayers(map, default = "Esri.WorldGrayCanvas")
+addShintoMapLayers(
+  map,
+  default = "Esri.WorldGrayCanvas",
+  position = "topright"
+)
 }
 \description{
 Add map layers
