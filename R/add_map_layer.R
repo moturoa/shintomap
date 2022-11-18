@@ -1,5 +1,5 @@
 
-
+#- internal function used in shintoMapModule to add an actual polygon/point layer to a leaflet map
 
 add_map_layer <- function(map, lay, color_default, color_outline, label_function){
 
@@ -17,7 +17,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
 
     # No function to compute colors given; the column contains colors.
-    if(is.null(lay$color_function)){
+    if(is.null(lay$color_function) | is.null(lay$color_column)){
 
       if(is.null(lay$color_column)){
         color <- color_default  # single color for everything (fallback)
@@ -42,44 +42,51 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
     if(lay$toggle){
 
+      if(is.null(lay$geo_column)){
+        map_data <- lay$data
+      } else {
+        map_data <- lay$data[[lay$geo_column]]
+      }
+
+
       if(lay$geom == "CircleMarkers"){
 
         map <- map %>%
           leaflet::clearGroup(lay$group) %>%
-          leaflet::addCircleMarkers(data = lay$data,
+          leaflet::addCircleMarkers(data = map_data,
                                     layerId = lay$data[[lay$id_column]],
-                                    color = lay$data$FILL_COLOR,
+                                    color = lay$data[["FILL_COLOR"]],
                                     radius = lay$radius,
                                     group = lay$group,
                                     stroke = lay$stroke,
                                     weight = lay$weight,
                                     label = label_function(lay$data, params = label_params),
-                                    fillOpacity = lay$data$FILL_OPACITY)
+                                    fillOpacity = lay$data[["FILL_OPACITY"]])
 
       } else if(lay$geom == "Polygons"){
 
         map <- map %>%
           leaflet::clearGroup(lay$group) %>%
-          leaflet::addPolygons(data = lay$data,
+          leaflet::addPolygons(data = map_data,
                                layerId = lay$data[[lay$id_column]],
-                               fillColor = lay$data$FILL_COLOR,
+                               fillColor = lay$data[["FILL_COLOR"]],
                                group = lay$group,
                                stroke = lay$stroke,
                                color = color_outline,
                                label = label_function(lay$data, params = label_params),
                                weight = lay$weight,
                                highlightOptions = lay$highlightOptions,
-                               fillOpacity = lay$data$FILL_OPACITY)
+                               fillOpacity = lay$data[["FILL_OPACITY"]])
 
       } else if(lay$geom == "Polylines"){
 
         map <- map %>%
           leaflet::clearGroup(lay$group) %>%
-          leaflet::addPolylines(data = lay$data,
+          leaflet::addPolylines(data = map_data,
                                 layerId = lay$data[[lay$id_column]],
                                 stroke = lay$stroke,
                                 weight = lay$weight,
-                                color = lay$data$FILL_COLOR,
+                                color = lay$data[["FILL_COLOR"]],
                                 group = lay$group,
                                 label = label_function(lay$data, params = label_params))
 
@@ -87,24 +94,24 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
         map <- map %>%
           leaflet::clearGroup(lay$group) %>%
-          leafgl::addGlPolygons(data = lay$data,
+          leafgl::addGlPolygons(data = map_data,
                                 layerId = lay$data[[lay$id_column]],
-                                fillColor = lay$data$FILL_COLOR,
+                                fillColor = lay$data[["FILL_COLOR"]],
                                 group = lay$group,
                                 color = color_outline,
                                 label = label_function(lay$data, params = label_params),
                                 weight = lay$weight,
                                 stroke = lay$stroke,
-                                fillOpacity = lay$data$FILL_OPACITY)
+                                fillOpacity = lay$data[["FILL_OPACITY"]])
 
       } else if(lay$geom == "GlPoints"){
 
         map <- map %>%
           leaflet::clearGroup(lay$group) %>%
-          leafgl::addGlPoints(data = lay$data,
+          leafgl::addGlPoints(data = map_data,
                               layerId = lay$data[[lay$id_column]],
-                              fillColor = lay$data$FILL_COLOR,
-                              fillOpacity = lay$data$FILL_OPACITY,
+                              fillColor = lay$data[["FILL_COLOR"]],
+                              fillOpacity = lay$data[["FILL_OPACITY"]],
                               radius = lay$radius,
                               group = lay$group)
 
