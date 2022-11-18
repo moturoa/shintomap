@@ -12,6 +12,7 @@
 #' @importFrom grDevices rgb
 binned_numeric_map_color <- function(vals, n = 20,
                                      palette_function = "viridis",
+                                     colors = NULL,
                                      reverse = FALSE,
                                      method = c("bin","quantile"),
                                      pretty = TRUE,
@@ -19,7 +20,14 @@ binned_numeric_map_color <- function(vals, n = 20,
 
   method <- match.arg(method)
 
-  colors <- get_pals_colors(palette_function, n)
+  if(is.null(colors)){
+    colors <- get_pals_colors(palette_function, n)
+  } else if(length(colors) < n){
+    stopifnot(length(colors)>0)
+    warning("not enough colors provided; recycling")
+    colors <- rep(colors, times = ceiling(n / length(colors))+1)[1:n]
+  }
+
 
   if(method == "quantile"){
     out <- leaflet::colorQuantile(colors,

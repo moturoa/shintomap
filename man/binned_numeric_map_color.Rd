@@ -8,6 +8,7 @@ binned_numeric_map_color(
   vals,
   n = 20,
   palette_function = "viridis",
+  colors = NULL,
   reverse = FALSE,
   method = c("bin", "quantile"),
   pretty = TRUE,
