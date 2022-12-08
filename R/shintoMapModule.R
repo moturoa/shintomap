@@ -76,6 +76,8 @@ shintoMapModule <- function(input, output, session,
                       layers = list()){
 
 
+  # allow a NULL in layers (easier on the shiny sidex)
+  layers <- dropNulls(layers)
 
   output$txt_out <- shiny::renderPrint({
     shiny::reactiveValuesToList(input)
