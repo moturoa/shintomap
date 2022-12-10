@@ -40,7 +40,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
     }
 
-    if(lay$toggle){
+    if(!is.null(lay$toggle) && lay$toggle){
 
       if(is.null(lay$geo_column)){
         map_data <- lay$data
