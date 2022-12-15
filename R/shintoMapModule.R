@@ -89,6 +89,7 @@ shintoMapModule <- function(input, output, session,
   output$map <- leaflet::renderLeaflet({
 
     toggle_reload()
+    print("Rendering leaflet")
 
     # Use shintoBaseMap to make the static leaflet map (with map tiles and a view)
     map <- base_map
