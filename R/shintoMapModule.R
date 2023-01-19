@@ -75,6 +75,9 @@ shintoMapModule <- function(input, output, session,
                       proxy = TRUE,
                       layers = list()){
 
+  if(shiny::is.reactive(layers)){
+    stop("'layers' argument must be a list of reactive's")
+  }
 
   # allow a NULL in layers (easier on the shiny sidex)
   layers <- dropNulls(layers)

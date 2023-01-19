@@ -32,11 +32,22 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
       # Compute colors, add a Legend
       col_fun_name <- lay$color_function$palfunction
       opt <- lay$color_function[-1]
-      opt$vals <- lay$data[[lay$color_column]]
-      p_color_fun <- do.call(base::get(col_fun_name), opt)
 
-      lay$data$FILL_COLOR <- p_color_fun(lay$data[[lay$color_column]])
-      lay$data$FILL_OPACITY <- opt$opacity
+      if(!hasName(lay$data, lay$color_column)){
+
+        warning(paste("Color column", lay$color_column, "not found in data, using default color"))
+        lay$data$FILL_COLOR <- color_default
+        lay$data$FILL_OPACITY <- lay$opacity
+
+      } else {
+
+        opt$vals <- lay$data[[lay$color_column]]
+        p_color_fun <- do.call(base::get(col_fun_name), opt)
+
+        lay$data$FILL_COLOR <- p_color_fun(lay$data[[lay$color_column]])
+        lay$data$FILL_OPACITY <- opt$opacity
+      }
+
 
     }
 
@@ -51,6 +62,17 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
       if(lay$geom == "CircleMarkers"){
 
+        if(is.null(lay$clustering)){
+          clus <- NULL
+        } else {
+          if(is.logical(lay$clustering) && isTRUE(lay$clustering)){
+            clus <- markerClusterOptions()
+          } else {
+            clus <- do.call(markerClusterOptions, lay$clustering)
+          }
+
+        }
+
         map <- map %>%
           leaflet::clearGroup(lay$group) %>%
           leaflet::addCircleMarkers(data = map_data,
@@ -60,6 +82,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
                                     group = lay$group,
                                     stroke = lay$stroke,
                                     weight = lay$weight,
+                                    clusterOptions = clus,
                                     label = label_function(lay$data, params = label_params),
                                     fillOpacity = lay$data[["FILL_OPACITY"]])
 
