@@ -98,6 +98,7 @@ shintoMapModule <- function(input, output, session,
     map <- base_map
 
     # Border
+    req(border())
     border_data <- shiny::isolate(border())
 
     if(!is.null(border_data)){
