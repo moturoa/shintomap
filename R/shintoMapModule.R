@@ -92,7 +92,6 @@ shintoMapModule <- function(input, output, session,
   output$map <- leaflet::renderLeaflet({
 
     toggle_reload()
-    print("Rendering leaflet")
 
     # Use shintoBaseMap to make the static leaflet map (with map tiles and a view)
     map <- base_map
@@ -102,13 +101,17 @@ shintoMapModule <- function(input, output, session,
     border_data <- shiny::isolate(border())
 
     if(!is.null(border_data)){
-      map <- map %>%
-        leaflet::addPolygons(data = border_data,
-                    group = "grens",
-                    fill = FALSE,
-                    stroke = TRUE,
-                    weight = border_weight,
-                    color = border_color)
+
+      suppressWarnings({
+        map <- map %>%
+          leaflet::addPolygons(data = border_data,
+                               group = "grens",
+                               fill = FALSE,
+                               stroke = TRUE,
+                               weight = border_weight,
+                               color = border_color)
+      })
+
     }
 
     ui_ping(runif(1))
@@ -193,7 +196,9 @@ shintoMapModule <- function(input, output, session,
         ui_ping()
         lay <- layer()
 
-        map <- add_map_layer(map, lay, color_default, color_outline, label_function)
+        suppressWarnings({
+          map <- add_map_layer(map, lay, color_default, color_outline, label_function)
+        })
 
       })
 
