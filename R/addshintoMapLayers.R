@@ -22,11 +22,21 @@ addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas", position =
   map <- map %>%
     leaflet::addTiles(urlTemplate = "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png",
              group = "Standaard NL (PDOK BRT)") %>%
+
+    leaflet::addWMSTiles(
+      "https://service.pdok.nl/hwh/luchtfotorgb/wms/v1_0",
+      layers = "Actueel_orthoHR",
+      group = "Luchtfoto Actueel HighRes (PDOK)",
+      options = WMSTileOptions(maxNativeZoom = 22, maxZoom = 24)
+    ) %>%
+
     leaflet::addWMSTiles(
       "https://service.pdok.nl/hwh/luchtfotocir/wms/v1_0",
-      layers = "Actueel_ortho25",
-      group = "Luchtfoto Actueel (PDOK)"
+      layers = "Actueel_ortho25IR",
+      group = "Luchtfoto Actueel IR (PDOK)",
+      options = WMSTileOptions(maxNativeZoom = 22, maxZoom = 24)
     ) %>%
+
     leaflet::addWMSTiles(
       "https://geodata.nationaalgeoregister.nl/kadastralekaart/wms/v4_0",
       layers = "kadastralekaart",
@@ -36,7 +46,8 @@ addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas", position =
   map <- map %>%
     leaflet::addLayersControl(baseGroups = c(names(tiles),
                                     "Standaard NL (PDOK BRT)",
-                                    "Luchtfoto Actueel (PDOK)",
+                                    "Luchtfoto Actueel HighRes (PDOK)",
+                                    "Luchtfoto Actueel IR (PDOK)",
                                     "Kadastrale kaart"),
                               position = position)
 

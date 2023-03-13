@@ -1,7 +1,7 @@
 Package: shintomap
 Type: Package
 Title: Shinto Maps
-Version: 0.2-4
+Version: 0.3
 Author: Remko Duursma
 Maintainer: Remko Duursma <remko@shintolabs.nl>
 Description: Standard interactive Shinto map based on leaflet. Replaces

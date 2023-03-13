@@ -13,6 +13,7 @@ ui <- softui::simple_page(
   softui::box(title = "shintomap", icon = bsicon("geo-alt-fill"), width = 6,
 
               shintoMapUI("map", height = 800),
+              radioButtons("switch", "Gebieden", choices = c("Ja","Nee"), selected = "Ja"),
 
               verbatimTextOutput("txt_out")
               )
@@ -51,7 +52,7 @@ server <- function(input, output, session) {
 
                  list(
                    data = geo$buurten,
-                   toggle = TRUE,
+                   toggle = input$switch == "Ja",
                    group = "area_layer",
                    geom = "Polygons",
                    id_column = "bu_code",
