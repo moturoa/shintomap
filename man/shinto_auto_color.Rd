@@ -4,7 +4,7 @@
 \alias{shinto_auto_color}
 \title{Map colors, auto}
 \usage{
-shinto_auto_color(vals, ...)
+shinto_auto_color(vals, ..., force_factor = FALSE)
 }
 \description{
 Map colors, auto

@@ -42,6 +42,8 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
       } else {
 
         opt$vals <- lay$data[[lay$color_column]]
+        opt$force_factor <- any(lay$color_column %in% lay$force_factor)  # T/F, sent to shinto_auto_color
+
         p_color_fun <- do.call(base::get(col_fun_name), opt)
 
         lay$data$FILL_COLOR <- p_color_fun(lay$data[[lay$color_column]])
@@ -152,7 +154,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
       if(isTRUE(lay$legend$toggle) && lay$toggle && !all(is.na(val_for_color))){
 
-        if(is.numeric(val_for_color)){   # !color_col %in% force_factor &
+        if(is.numeric(val_for_color) && !lay$color_col %in% lay$force_factor){
           brk <- attributes(p_color_fun)$colorArgs$bins
 
           labs <- paste(brk[1:(length(brk)-1)], brk[2:length(brk)], sep = " - ")

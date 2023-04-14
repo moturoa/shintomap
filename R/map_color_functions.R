@@ -100,10 +100,10 @@ factor_map_color <- function(vals, colors = NULL,
 
 #' Map colors, auto
 #' @export
-shinto_auto_color <- function(vals, ...){
+shinto_auto_color <- function(vals, ..., force_factor = FALSE){
 
 
-  if(is.numeric(vals)){
+  if(is.numeric(vals) & !force_factor){
     binned_numeric_map_color(vals = vals, ...)
   } else {
     factor_map_color(vals = vals, ...)
