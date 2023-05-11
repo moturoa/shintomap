@@ -1,7 +1,10 @@
 #' Add map layers
 #' @export
 #' @importFrom leaflet addProviderTiles addTiles addWMSTiles WMSTileOptions addLayersControl
-addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas", position = "topright"){
+addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas",
+                               position = "topright",
+                               openstreetmap_extend_zoom = FALSE
+                               ){
 
   tiles <- c(
     "Kaart - grijs (ESRI)" = "Esri.WorldGrayCanvas",
@@ -15,9 +18,20 @@ addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas", position =
   )
 
   for(i in seq_along(tiles)){
-    map <- map %>%
-      leaflet::addProviderTiles(unname(tiles[i]), group = names(tiles[i]))
+
+    # Max zoom extenden (voor intekenen gebied in WBM zodat je de kaart verder dan de native max zoom kan inzoomen)
+    if(names(tiles[i]) == "OpenStreetMap" & openstreetmap_extend_zoom){
+      map <- map %>%
+        leaflet::addProviderTiles(unname(tiles[i]), group = names(tiles[i]),
+                                  options = providerTileOptions(maxNativeZoom = 18, maxZoom = 22))
+    } else {
+      map <- map %>%
+        leaflet::addProviderTiles(unname(tiles[i]), group = names(tiles[i]))
+    }
+
   }
+
+
 
   map <- map %>%
     leaflet::addTiles(urlTemplate = "https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png",

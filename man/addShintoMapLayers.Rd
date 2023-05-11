@@ -7,7 +7,8 @@
 addShintoMapLayers(
   map,
   default = "Esri.WorldGrayCanvas",
-  position = "topright"
+  position = "topright",
+  openstreetmap_extend_zoom = FALSE
 )
 }
 \description{
