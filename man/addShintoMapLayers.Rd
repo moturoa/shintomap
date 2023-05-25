@@ -2,15 +2,28 @@
 % Please edit documentation in R/addshintoMapLayers.R
 \name{addShintoMapLayers}
 \alias{addShintoMapLayers}
-\title{Add map layers}
+\title{Add map tiles to a leaflet map, shinto style}
 \usage{
 addShintoMapLayers(
   map,
   default = "Esri.WorldGrayCanvas",
   position = "topright",
-  openstreetmap_extend_zoom = FALSE
+  openstreetmap_extend_zoom = FALSE,
+  kadaster_opacity = 0.5
 )
 }
+\arguments{
+\item{map}{A Leaflet map object}
+
+\item{default}{Default selected layer}
+
+\item{openstreetmap_extend_zoom}{If TRUE, extends zoom in OpenStreetMap layer beyond native zoom,
+so we can zoom in further (with lower resolution). Useful for drawing on map.}
+
+\item{kadaster_opacity}{Opacity of the kadaster map overlayed over the Standaard NL map. If you don't want to
+see the standaard NL map, set opacity to 1.0.}
+}
 \description{
-Add map layers
+Standardized map tiles for Shinto applications. Standaard NL, ESRI gray, OpenStreetMap,
+Kadaster map (overlayed over standaard NL with transparency), PDOK arial photos (RGB, IR)
 }
