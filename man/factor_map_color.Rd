@@ -10,6 +10,8 @@ factor_map_color(
   palette_function = "viridis",
   reverse = FALSE,
   na.color = grDevices::rgb(0, 0, 0, 0),
+  bins_predefined = NULL,
+  method = c("auto", "predefined"),
   ...
 )
 }

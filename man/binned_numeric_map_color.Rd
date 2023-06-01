@@ -10,8 +10,9 @@ binned_numeric_map_color(
   palette_function = "viridis",
   colors = NULL,
   reverse = FALSE,
-  method = c("bin", "quantile"),
+  method = c("bin", "quantile", "predefined"),
   pretty = TRUE,
+  bins_predefined = NULL,
   na.color = grDevices::rgb(0, 0, 0, 0),
   ...
 )
