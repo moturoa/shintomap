@@ -60,7 +60,11 @@
 
     out <- function(values, ...){
       bins <- bins_predefined
-      bins <- c(bins, ceiling(10*max(vals))/10)
+
+      maxval <- ceiling(10*max(vals))/10
+      if(maxval > max(bins)){
+        bins <- c(bins, maxval)
+      }
 
       ii <- findInterval(values, bins, all.inside = TRUE)
       lookup_colors <- c(na.color, colors)
@@ -91,6 +95,7 @@ factor_map_color <- function(vals,
                              colors = NULL,
                              palette_function = "viridis",
                              reverse = FALSE,
+                             color_other = "#D3D3D3",
                              na.color = grDevices::rgb(0,0,0,0),
                              bins_predefined = NULL,
                              method = c("auto","predefined"),
@@ -123,7 +128,8 @@ factor_map_color <- function(vals,
   function(value){
     ii <- match(value, names(colors))
     out <- colors[ii]
-    out[is.na(out)] <- na.color
+    out[is.na(value)] <- na.color
+    out[is.na(out)] <- color_other
     unname(out)
   }
 

@@ -154,12 +154,21 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
       if(isTRUE(lay$legend$toggle) && lay$toggle && !all(is.na(val_for_color))){
 
-
         if(isTRUE(lay$color_function$method == "predefined")){
 
-          brk <- lay$color_function$bins_predefined
           legend_cols <- lay$color_function$colors
           labs <- lay$color_function$labels
+
+          # Color that is used for levels that could not be matched (e.g. "Gemengd")
+          # This does not apply to numeric because they are forced inside the bins anyway
+          if(!is.numeric(val_for_color) && !is.null(lay$color_function$color_other)){
+
+            mixlab <- lay$color_function$label_other
+            if(is.null(mixlab))mixlab <- "label_other"
+            labs <- c(labs, mixlab)
+            legend_cols <- c(legend_cols, lay$color_function$color_other)
+
+          }
 
         } else if(is.numeric(val_for_color) && !lay$color_col %in% lay$force_factor){
 
