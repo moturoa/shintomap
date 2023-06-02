@@ -53,7 +53,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
     }
 
-    if(!is.null(lay$toggle) && lay$toggle){
+    if(is.null(lay$toggle) || lay$toggle){
 
       if(is.null(lay$geo_column)){
         map_data <- lay$data
@@ -154,17 +154,27 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
       if(isTRUE(lay$legend$toggle) && lay$toggle && !all(is.na(val_for_color))){
 
-        if(is.numeric(val_for_color) && !lay$color_col %in% lay$force_factor){
-          brk <- attributes(p_color_fun)$colorArgs$bins
 
-          labs <- paste(brk[1:(length(brk)-1)], brk[2:length(brk)], sep = " - ")
-          brk <- brk[-length(brk)]  # last one is the max, not a bin
+        if(isTRUE(lay$color_function$method == "predefined")){
+
+          brk <- lay$color_function$bins_predefined
+          legend_cols <- lay$color_function$colors
+          labs <- lay$color_function$labels
+
+        } else if(is.numeric(val_for_color) && !lay$color_col %in% lay$force_factor){
+
+            brk <- attributes(p_color_fun)$colorArgs$bins
+
+            labs <- paste(brk[1:(length(brk)-1)], brk[2:length(brk)], sep = " - ")
+            brk <- brk[-length(brk)]  # last one is the max, not a bin
+            legend_cols <- p_color_fun(brk)
+
         } else {
+
           brk <- levels(as.factor(val_for_color))
           labs <- brk
+          legend_cols <- p_color_fun(brk)
         }
-
-        legend_cols <- p_color_fun(brk)
 
         map <- map %>% leaflet::removeControl(paste0(lay$group,"_color_fill_legend")) %>%
           leaflet::addLegend(colors = legend_cols,

@@ -10,7 +10,7 @@
 #' @importFrom leaflet colorBin colorQuantile
 #' @importFrom  utils getFromNamespace
 #' @importFrom grDevices rgb
-binned_numeric_map_color <- function(vals,
+  binned_numeric_map_color <- function(vals,
                                      n = 20,
                                      palette_function = "viridis",
                                      colors = NULL,
@@ -60,12 +60,11 @@ binned_numeric_map_color <- function(vals,
 
     out <- function(values, ...){
       bins <- bins_predefined
-      levs <- c(paste(bins[1:(length(bins)-1)], "-",
-                      bins[2:length(bins)]), paste(bins[length(bins)], "+"))
+      bins <- c(bins, ceiling(10*max(vals))/10)
 
-      bins <- c(bins, round(10*max(vals),1)/10)
-
-      colors[findInterval(values, bins)]
+      ii <- findInterval(values, bins, all.inside = TRUE)
+      lookup_colors <- c(na.color, colors)
+      lookup_colors[ii + 1]  # so that 0 (no bin found) is the first, which is the na.color
 
     }
 
@@ -121,7 +120,6 @@ factor_map_color <- function(vals,
     colors <- setNames(colors, bins_predefined)
   }
 
-
   function(value){
     ii <- match(value, names(colors))
     out <- colors[ii]
@@ -135,7 +133,6 @@ factor_map_color <- function(vals,
 #' Map colors, auto
 #' @export
 shinto_auto_color <- function(vals, ..., force_factor = FALSE){
-
 
   if(is.numeric(vals) & !force_factor){
     binned_numeric_map_color(vals = vals, ...)
