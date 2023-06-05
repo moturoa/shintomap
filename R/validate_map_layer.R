@@ -42,6 +42,7 @@ validate_map_layer <- function(layer){
     if(layer$geom == "CircleMarkers"){
 
         if(!have("radius"))layer$radius <- 5
+        if(!have("opacity"))layer$opacity <- 1
         if(!have("weight"))layer$weight <- 1
         if(!have("stroke"))layer$stroke <- TRUE
     }

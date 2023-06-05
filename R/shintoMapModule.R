@@ -196,8 +196,16 @@ shintoMapModule <- function(input, output, session,
         ui_ping()
         lay <- layer()
 
+        if(is.null(lay$color_outline)){
+          lay$color_outline <- color_outline
+        }
+
         suppressWarnings({
-          map <- add_map_layer(map, lay, color_default, color_outline, label_function())
+          map <- add_map_layer(map = map,
+                               lay = lay,
+                               color_default = color_default,
+                               color_outline = lay$color_outline,
+                               label_function = label_function())
         })
 
       })

@@ -87,11 +87,13 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
           lab_options <- NULL
         }
 
+
         map <- map %>%
           leaflet::clearGroup(lay$group) %>%
           leaflet::addCircleMarkers(data = map_data,
                                     layerId = lay$data[[lay$id_column]],
-                                    color = lay$data[["FILL_COLOR"]],
+                                    color = color_outline,
+                                    fillColor = lay$data[["FILL_COLOR"]],
                                     radius = lay$radius,
                                     group = lay$group,
                                     stroke = lay$stroke,
@@ -99,6 +101,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
                                     clusterOptions = clus,
                                     label = label_function(lay$data, params = label_params),
                                     labelOptions = lab_options,
+                                    opacity = lay$opacity,
                                     fillOpacity = lay$data[["FILL_OPACITY"]])
 
       } else if(lay$geom == "Polygons"){
