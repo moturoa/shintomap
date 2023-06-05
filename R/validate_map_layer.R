@@ -30,12 +30,6 @@ validate_map_layer <- function(layer){
     }
 
     if(have("popup"))message("'popup' ignored in shintomap (use reactive click and a modal instead)")
-    if(have("color_function") & have("opacity")){
-      message("'opacity' ignored in shintomap layer when 'color_function' provided")
-    }
-    if(!have("color_function") & !have("opacity")){
-      layer$opacity <- 0.8
-    }
 
 
     # geom-specific settings
