@@ -65,7 +65,7 @@ shintoMapModule <- function(input, output, session,
                       border_color = "#4f4f4f",
                       auto_recenter = FALSE,
 
-                      label_function = function(data,...)NULL,   # functie om van de id een label (hover) te maken
+                      label_function = reactive(function(data,...)NULL),   # functie om van de id een label (hover) te maken
                       label_params = list(),   # settings passed to label_function (can be anything)
 
                       color_default = "#023e8a",
@@ -122,7 +122,7 @@ shintoMapModule <- function(input, output, session,
       for(i in seq_along(layers)){
 
         lay <- layers[[i]]()
-        map <- add_map_layer(map, lay, color_default, color_outline, label_function)
+        map <- add_map_layer(map, lay, color_default, color_outline, label_function())
       }
 
       if(auto_recenter){
@@ -197,7 +197,7 @@ shintoMapModule <- function(input, output, session,
         lay <- layer()
 
         suppressWarnings({
-          map <- add_map_layer(map, lay, color_default, color_outline, label_function)
+          map <- add_map_layer(map, lay, color_default, color_outline, label_function())
         })
 
       })

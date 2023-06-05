@@ -14,7 +14,7 @@ shintoMapModule(
   border_weight = 2,
   border_color = "#4f4f4f",
   auto_recenter = FALSE,
-  label_function = function(data, ...) NULL,
+  label_function = reactive(function(data, ...) NULL),
   label_params = list(),
   color_default = "#023e8a",
   color_outline = "#FFFFFF",

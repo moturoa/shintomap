@@ -67,12 +67,24 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
         if(is.null(lay$clustering)){
           clus <- NULL
         } else {
-          if(is.logical(lay$clustering) && isTRUE(lay$clustering)){
-            clus <- markerClusterOptions()
+
+          if(is.logical(lay$clustering)){
+            if(isTRUE(lay$clustering)){
+              clus <- markerClusterOptions()
+            } else {
+              clus <- NULL
+            }
+
           } else {
             clus <- do.call(markerClusterOptions, lay$clustering)
           }
 
+        }
+
+        if(isTRUE(lay$label_fixed)){
+          lab_options <-  labelOptions(noHide = TRUE, textsize = 10, textOnly = TRUE)
+        } else {
+          lab_options <- NULL
         }
 
         map <- map %>%
@@ -86,6 +98,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
                                     weight = lay$weight,
                                     clusterOptions = clus,
                                     label = label_function(lay$data, params = label_params),
+                                    labelOptions = lab_options,
                                     fillOpacity = lay$data[["FILL_OPACITY"]])
 
       } else if(lay$geom == "Polygons"){

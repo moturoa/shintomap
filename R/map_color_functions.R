@@ -10,7 +10,7 @@
 #' @importFrom leaflet colorBin colorQuantile
 #' @importFrom  utils getFromNamespace
 #' @importFrom grDevices rgb
-  binned_numeric_map_color <- function(vals,
+binned_numeric_map_color <- function(vals,
                                      n = 20,
                                      palette_function = "viridis",
                                      colors = NULL,
