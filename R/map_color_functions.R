@@ -61,8 +61,8 @@ binned_numeric_map_color <- function(vals,
     out <- function(values, ...){
       bins <- bins_predefined
 
-      maxval <- ceiling(10*max(vals))/10
-      if(maxval > max(bins)){
+      maxval <- ceiling(10*max(vals, na.rm = TRUE))/10
+      if(maxval > max(bins, na.rm = TRUE)){
         bins <- c(bins, maxval)
       }
 
