@@ -200,12 +200,16 @@ shintoMapModule <- function(input, output, session,
           lay$color_outline <- color_outline
         }
 
+        if(is.reactive(label_function)){
+          label_function <- label_function()
+        }
+
         suppressWarnings({
           map <- add_map_layer(map = map,
                                lay = lay,
                                color_default = color_default,
                                color_outline = lay$color_outline,
-                               label_function = label_function())
+                               label_function = label_function)
         })
 
       })
