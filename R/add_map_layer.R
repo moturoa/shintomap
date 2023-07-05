@@ -53,7 +53,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
     }
 
-    if(!is.null(lay$toggle) && lay$toggle){
+    if(is.null(lay$toggle) || lay$toggle){
 
       if(is.null(lay$geo_column)){
         map_data <- lay$data
@@ -67,25 +67,41 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
         if(is.null(lay$clustering)){
           clus <- NULL
         } else {
-          if(is.logical(lay$clustering) && isTRUE(lay$clustering)){
-            clus <- markerClusterOptions()
+
+          if(is.logical(lay$clustering)){
+            if(isTRUE(lay$clustering)){
+              clus <- markerClusterOptions()
+            } else {
+              clus <- NULL
+            }
+
           } else {
             clus <- do.call(markerClusterOptions, lay$clustering)
           }
 
         }
 
+        if(isTRUE(lay$label_fixed)){
+          lab_options <-  labelOptions(noHide = TRUE, textsize = 10, textOnly = TRUE)
+        } else {
+          lab_options <- NULL
+        }
+
+
         map <- map %>%
           leaflet::clearGroup(lay$group) %>%
           leaflet::addCircleMarkers(data = map_data,
                                     layerId = lay$data[[lay$id_column]],
-                                    color = lay$data[["FILL_COLOR"]],
+                                    color = color_outline,
+                                    fillColor = lay$data[["FILL_COLOR"]],
                                     radius = lay$radius,
                                     group = lay$group,
                                     stroke = lay$stroke,
                                     weight = lay$weight,
                                     clusterOptions = clus,
                                     label = label_function(lay$data, params = label_params),
+                                    labelOptions = lab_options,
+                                    opacity = lay$opacity,
                                     fillOpacity = lay$data[["FILL_OPACITY"]])
 
       } else if(lay$geom == "Polygons"){
@@ -154,17 +170,36 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
       if(isTRUE(lay$legend$toggle) && lay$toggle && !all(is.na(val_for_color))){
 
-        if(is.numeric(val_for_color) && !lay$color_col %in% lay$force_factor){
-          brk <- attributes(p_color_fun)$colorArgs$bins
+        if(isTRUE(lay$color_function$method == "predefined")){
 
-          labs <- paste(brk[1:(length(brk)-1)], brk[2:length(brk)], sep = " - ")
-          brk <- brk[-length(brk)]  # last one is the max, not a bin
+          legend_cols <- lay$color_function$colors
+          labs <- lay$color_function$labels
+
+          # Color that is used for levels that could not be matched (e.g. "Gemengd")
+          # This does not apply to numeric because they are forced inside the bins anyway
+          if(!is.numeric(val_for_color) && !is.null(lay$color_function$color_other)){
+
+            mixlab <- lay$color_function$label_other
+            if(is.null(mixlab))mixlab <- "label_other"
+            labs <- c(labs, mixlab)
+            legend_cols <- c(legend_cols, lay$color_function$color_other)
+
+          }
+
+        } else if(is.numeric(val_for_color) && !lay$color_col %in% lay$force_factor){
+
+            brk <- attributes(p_color_fun)$colorArgs$bins
+
+            labs <- paste(brk[1:(length(brk)-1)], brk[2:length(brk)], sep = " - ")
+            brk <- brk[-length(brk)]  # last one is the max, not a bin
+            legend_cols <- p_color_fun(brk)
+
         } else {
+
           brk <- levels(as.factor(val_for_color))
           labs <- brk
+          legend_cols <- p_color_fun(brk)
         }
-
-        legend_cols <- p_color_fun(brk)
 
         map <- map %>% leaflet::removeControl(paste0(lay$group,"_color_fill_legend")) %>%
           leaflet::addLegend(colors = legend_cols,

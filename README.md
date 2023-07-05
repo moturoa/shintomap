@@ -1,5 +1,8 @@
 
-![](https://badgen.net/badge/shintolabs/development/orange)
+![](https://badgen.net/badge/shintolabs/production/green)
+![](https://badgen.net/badge/gitflow/enabled/green)
+
+
 # shintomap
 
 

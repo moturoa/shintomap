@@ -30,18 +30,13 @@ validate_map_layer <- function(layer){
     }
 
     if(have("popup"))message("'popup' ignored in shintomap (use reactive click and a modal instead)")
-    if(have("color_function") & have("opacity")){
-      message("'opacity' ignored in shintomap layer when 'color_function' provided")
-    }
-    if(!have("color_function") & !have("opacity")){
-      layer$opacity <- 0.8
-    }
 
 
     # geom-specific settings
     if(layer$geom == "CircleMarkers"){
 
-        if(!have("radius"))layer$radius <- 5
+        if(!have("radius"))layer$radius <- 6
+        if(!have("opacity"))layer$opacity <- 1
         if(!have("weight"))layer$weight <- 1
         if(!have("stroke"))layer$stroke <- TRUE
     }
@@ -51,6 +46,7 @@ validate_map_layer <- function(layer){
 
       if(!have("weight"))layer$weight <- 1
       if(!have("stroke"))layer$stroke <- TRUE
+      if(!have("opacity"))layer$opacity <- 0.9
     }
 
     if(layer$geom == "Polylines"){

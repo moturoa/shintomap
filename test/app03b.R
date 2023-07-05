@@ -45,7 +45,7 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
              base_map = my_base_map,
              render_not_visible = TRUE, # for use in modal!
              border = reactive(geo$grens),
-             label_function = function(data,...)data$bu_naam,
+             label_function = reactive(function(data,...)data$bu_naam),
              ...,
 
              layers = list(

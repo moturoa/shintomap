@@ -66,7 +66,7 @@ server <- function(input, output, session) {
   callModule(shintoMapModule, "map",
              base_map = my_base_map,
              border = reactive(geo$grens),
-             label_function = function(data,...)data$bu_naam,
+             label_function = reactive(function(data,...)data$bu_naam),
 
              layers = list(
 
