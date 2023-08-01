@@ -5,6 +5,17 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
 
   lay <- validate_map_layer(lay)
 
+  # label_function can be a global arg (used for all layers),
+  # or a layer-specific arg (overrides global, if defined)
+  if(!is.null(lay$label_function)){
+    label_function <- lay$label_function
+  }
+
+
+  if(is.reactive(lay$data)){
+    stop("reactive passed inside config for shintomap::add_map_layer")
+  }
+
   if(is.null(lay) || is.null(lay$data) || nrow(lay$data) == 0){
 
     if(is.null(lay$group))lay$group <- "none"
