@@ -10,6 +10,6 @@ Description: Standard interactive Shinto map based on leaflet. Replaces
 Depends: magrittr
 Imports: leaflet, htmltools, shiny, leafgl, glue
 Encoding: UTF-8
-LazyData: true
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
+License: GPL (>= 3)
