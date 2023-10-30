@@ -44,12 +44,14 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
       col_fun_name <- lay$color_function$palfunction
       opt <- lay$color_function[-1]
 
+      # The provided column is not present in the data (fallback colors + warning)
       if(!hasName(lay$data, lay$color_column)){
 
         warning(paste("Color column", lay$color_column, "not found in data, using default color"))
         lay$data$FILL_COLOR <- color_default
         lay$data$FILL_OPACITY <- lay$opacity
 
+      # otherwise compute the colors, using the provided function name (usually: shinto_auto_color)
       } else {
 
         opt$vals <- lay$data[[lay$color_column]]
@@ -58,6 +60,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
         p_color_fun <- do.call(base::get(col_fun_name), opt)
 
         lay$data$FILL_COLOR <- p_color_fun(lay$data[[lay$color_column]])
+
         lay$data$FILL_OPACITY <- opt$opacity
       }
 

@@ -55,18 +55,17 @@ binned_numeric_map_color <- function(vals,
       stop("with method = predefined, also predefine the colors!")
     }
 
-    # convention: predfined bins do not inlclude maximum.
-    # add it here.
-
     out <- function(values, ...){
       bins <- bins_predefined
 
+      # convention: predfined bins do not inlclude maximum.
+      # add it here.
       maxval <- ceiling(10*max(vals, na.rm = TRUE))/10
       if(maxval > max(bins, na.rm = TRUE)){
         bins <- c(bins, maxval)
       }
 
-      ii <- findInterval(values, bins, all.inside = TRUE)
+      ii <- findInterval(values, bins, all.inside = FALSE)
       lookup_colors <- c(na.color, colors)
       lookup_colors[ii + 1]  # so that 0 (no bin found) is the first, which is the na.color
 
