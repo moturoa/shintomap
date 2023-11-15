@@ -7,9 +7,11 @@
 #' cuts it in equal quantile parts (so that each bin contains ca. equal number of observations)
 #' @param na.color Color for NA values (default white)
 #' @export
+#' @rdname map_colors
 #' @importFrom leaflet colorBin colorQuantile
 #' @importFrom  utils getFromNamespace
 #' @importFrom grDevices rgb
+#' @importFrom stats setNames
 binned_numeric_map_color <- function(vals,
                                      n = 20,
                                      palette_function = "viridis",
@@ -61,6 +63,7 @@ binned_numeric_map_color <- function(vals,
       # convention: predfined bins do not inlclude maximum.
       # add it here.
       maxval <- ceiling(10*max(vals, na.rm = TRUE))/10
+
       if(maxval > max(bins, na.rm = TRUE)){
         bins <- c(bins, maxval)
       }
@@ -77,7 +80,6 @@ binned_numeric_map_color <- function(vals,
 }
 
 
-#f <- binned_numeric_map_color(buurten_data$a_inw, n = 4)
 
 
 # Util. Get color function from the 'pals' package
@@ -89,6 +91,7 @@ get_pals_colors <- function(palette_function, n){
 
 
 #' Map colors for a factor variable
+#' @rdname map_colors
 #' @export
 factor_map_color <- function(vals,
                              colors = NULL,
@@ -119,9 +122,9 @@ factor_map_color <- function(vals,
   }
 
   if(method == "auto"){
-    colors <- setNames(colors, val_uniq)
+    colors <- stats::setNames(colors, val_uniq)
   } else {
-    colors <- setNames(colors, bins_predefined)
+    colors <- stats::setNames(colors, bins_predefined)
   }
 
   function(value){
@@ -136,7 +139,16 @@ factor_map_color <- function(vals,
 }
 
 #' Map colors, auto
+#' @rdname map_colors
 #' @export
+#' @examples
+#'  vals <- runif(100,0,100)
+#'  bins <- c(0,10,25,50)
+#'  colors <- c("green","red","blue","black")
+#'
+#'  fun <- shinto_auto_color(vals, bins = bins, method = "predefined", colors = colors)
+#'
+#'  fun(vals)
 shinto_auto_color <- function(vals, ..., force_factor = FALSE){
 
   if(is.numeric(vals) & !force_factor){

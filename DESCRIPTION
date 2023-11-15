@@ -8,7 +8,7 @@ Description: Standard interactive Shinto map based on leaflet. Replaces
     old 'leafletModule'. Make anything interactive. Add multiple layers.
     Color by attributes, automatic legends.
 Depends: magrittr
-Imports: leaflet, htmltools, shiny, leafgl, glue
+Imports: leaflet, htmltools, shiny, leafgl, glue, stats
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)

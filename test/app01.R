@@ -89,7 +89,7 @@ server <- function(input, output, session) {
                    color_function = list(
                      palfunction = "shinto_auto_color",
                      palette_function = "parula",
-                     reverse = FALSE,
+                     reverse = TRUE,
                      opacity = 0.8
                    ),
                    legend = list(

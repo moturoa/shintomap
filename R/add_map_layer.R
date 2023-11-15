@@ -57,6 +57,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
         opt$vals <- lay$data[[lay$color_column]]
         opt$force_factor <- any(lay$color_column %in% lay$force_factor)  # T/F, sent to shinto_auto_color
 
+        # Send all args to the function
         p_color_fun <- do.call(base::get(col_fun_name), opt)
 
         lay$data$FILL_COLOR <- p_color_fun(lay$data[[lay$color_column]])
