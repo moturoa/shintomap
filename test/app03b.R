@@ -1,9 +1,7 @@
 
 
-
-
-# fix of example 03:
-# ui_modal ftw
+# See example app 03.
+# Works slightly better through the use of a ui modal.
 
 
 library(shiny)
@@ -11,7 +9,6 @@ library(softui)
 library(leaflet)
 
 devtools::load_all()
-
 
 geo <- readRDS("geo_Eindhoven.rds")
 

@@ -1,26 +1,35 @@
 
+# shintomap Example app 02
+# - Advanced example with a 'circle select' tool to filter and immediately display data
 
-
+# Dependencies
 library(shiny)
 library(softui)
 library(leaflet)
 library(leafpm)
 library(sf)
 
+# Load this package
 devtools::load_all()
 
-
+# Geo data (in git)
 geo <- readRDS("geo_Eindhoven.rds")
-
 buurt_locaties <- sf::st_centroid(geo$buurten)
 
+#----- Shiny app ------
 ui <- softui::simple_page(
   softui::fluid_row(
     softui::box(title = "shintomap", icon = bsicon("geo-alt-fill"), width = 6,
 
+                tags$p(bsicon("info-circle-fill", status = "info"),
+                       "Click on the circle select tool (topright), draw a circle."),
+                tags$p("Then, use the move tool to move the circle around the map to filter the data."),
                 uiOutput("ui_circlesize"),
-                shintoMapUI("map", height = 800)
+
+                shintomap::shintoMapUI("map", height = 800)
     ),
+
+    # Debugger panel so we see what's going on
     softui::box(title = "Debug", icon = bsicon("bug"), width = 6,
 
                 verbatimTextOutput("txt_out")
@@ -31,12 +40,17 @@ ui <- softui::simple_page(
 
 server <- function(input, output, session) {
 
+  # debugger panel
   output$txt_out <- renderPrint({
     reactiveValuesToList(input)
   })
 
-
-  my_base_map <- shintoBaseMap(set_view = list(
+  # Base map (see app01 for more comments)
+  # - we can add anything to the base map that we can add to a leaflet() object,
+  # including a draw toolbar from the leafpm package
+  # Since it is difficult to know what sort of reactives are returned by addons,
+  # we have the debugger panel to inspect in detail
+  my_base_map <- shintomap::shintoBaseMap(set_view = list(
     lng = 5.463155,
     lat = 51.4497,
     zoom = 12
@@ -61,8 +75,20 @@ server <- function(input, output, session) {
     )
 
 
+  # All the data
   data_all <- reactiveVal(buurt_locaties)
 
+  # Filtered data by the circle
+  selected_data <- reactiveVal()
+
+  # Make sure that on init, the selected data is everything
+  # Otherwise the map is empty
+  observeEvent(data_all(), {
+    selected_data(data_all())
+  })
+
+  # Call the map module.
+  # This map has just one layer with few settings
   callModule(shintoMapModule, "map",
              base_map = my_base_map,
              border = reactive(geo$grens),
@@ -70,16 +96,15 @@ server <- function(input, output, session) {
 
              layers = list(
 
-               # Layer: gebouwen
+               # Layer: points
                reactive(
 
                  list(
-                   data = data_all(),
+                   data = selected_data(),
                    toggle = TRUE,
                    group = "area_layer",
                    geom = "CircleMarkers",
                    id_column = "bu_code"
-
                  )
 
                )
@@ -88,8 +113,7 @@ server <- function(input, output, session) {
   )
 
 
-  selected_data <- reactiveVal()
-
+  # Function to decide whether a point is in our drawn circle
   which_in_circle <- function(data, feature){
 
     my_circle <- list(
@@ -97,12 +121,13 @@ server <- function(input, output, session) {
       lat = feature$geometry$coordinates[[2]],
       radius = feature$properties$radius
     )
-    circle_point <- st_sfc(st_point(c(my_circle$lon,my_circle$lat))) %>%
-      st_set_crs(4326)
+    circle_point <- sf::st_sfc(sf::st_point(c(my_circle$lon,my_circle$lat))) %>%
+      sf::st_set_crs(4326)
 
-    st_is_within_distance(data, circle_point, dist = my_circle$radius, sparse = FALSE)
+    sf::st_is_within_distance(data, circle_point, dist = my_circle$radius, sparse = FALSE)
   }
 
+  # New feature drawn = new circle drawn on map
   observeEvent(input$`map-map_draw_new_feature`, {
 
     p <- input$`map-map_draw_new_feature`
@@ -111,13 +136,15 @@ server <- function(input, output, session) {
     if(!is.null(p$properties$radius)){
 
       i_y <- which_in_circle(data_all(), p)
+
+      # Filter the data and store in our reactiveVal
       selected_data(data_all()[which(i_y),])
 
     }
 
   })
 
-
+  # Keep track of the circle size, to plot above the map
   cur_circle_size <- reactiveVal()
 
   observeEvent(input$`map-map_draw_new_feature`$properties$radius, {
@@ -145,7 +172,7 @@ server <- function(input, output, session) {
 
   })
 
-
+  # Circle was edited
   observeEvent(input$`map-map_draw_edited_features`, {
 
     p <- input$`map-map_draw_edited_features`
@@ -160,7 +187,7 @@ server <- function(input, output, session) {
 
   })
 
-
+  # Circle was deleted
   observeEvent(input$map_draw_deleted_features, {
     selected_data(NULL)
     cur_circle_size(NULL)

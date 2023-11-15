@@ -1,12 +1,12 @@
 
+# shintomap example app 04
 
-# Example app with map on tab1, filters on tab2.
-# this has caused bugs in the past (I believe)
-# this works fine though
-# Another 'bug' happens with two layers, one on (toggled), one off, and accidentally
-# given the same 'group' name to both layers!
-# group shouldn't have to be input name?
+# - Multiple layers on 1 map, switch on and off with toggles
+# - Filters on another tab, that filter the areas shown on the map
+# - Buttons on the map, open a modal, make some map setting
+# - Use of selectinput below the map to adjust another setting
 
+# Dependencies
 library(shiny)
 library(softui)
 library(leaflet)
@@ -14,23 +14,39 @@ library(shinyWidgets)
 
 devtools::load_all()
 
+# Prepare the data
 geo <- readRDS("geo_Eindhoven.rds")
 geo$buurten$p_man <- geo$buurten$a_man / geo$buurten$a_inw
 
+# some points for plotting
 buurt_locaties <- sf::st_centroid(geo$buurten)
 
+# Shiny UI module
 mymapui <- function(id){
   ns <- NS(id)
 
-  tags$div(
-     materialSwitch(ns("tog1"), "Toggle Area", value = TRUE),
-     materialSwitch(ns("tog2"), "Toggle Points", value = FALSE),
-     shintoMapUI(ns("map"), height = 800),
+  softui::fluid_page(
+
+    softui::fluid_row(
+      column(6,
+             materialSwitch(ns("tog1"), "Toggle Area", value = TRUE),
+             materialSwitch(ns("tog2"), "Toggle Points", value = FALSE)
+             ),
+      column(6,
+             selectInput(ns("sel_palette"), "Palette",
+                         choices = c("parula","kovesi.rainbow","viridis")), # functions in the pals package
+             )
+    ),
+    softui::fluid_row(
+      shintoMapUI(ns("map"), height = 800)
+    ),
+
      verbatimTextOutput(ns("txt_out"))
   )
 
 }
 
+# Module server
 mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
 
@@ -47,8 +63,6 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
     addEasyButtonBar(
       map_easy_button(session$ns("btn_color_column"), icon_file = "layers-fill.svg",
                       label = "Kies kenmerk om kaart te kleuren"),
-      map_easy_button(session$ns("btn_fill_color"), icon_file = "palette-fill.svg",
-                      label = "Kleuren instellingen"),
       map_easy_button(session$ns("btn_help"), icon_file = "question-circle-fill.svg",
                       label = "Click here for help")
     )
@@ -80,7 +94,7 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
              layers = list(
 
-               # Layer: gebouwen
+               # Layer: areas
                reactive(
 
                  list(
@@ -94,7 +108,7 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
                    color_function = list(
                      palfunction = "shinto_auto_color",
-                     palette_function = "parula",
+                     palette_function = input$sel_palette,
                      reverse = FALSE,
                      n = 10,
                      opacity = 0.8
@@ -111,6 +125,7 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
                ),
 
+               # Layer: points
                reactive(
 
                  list(

@@ -47,7 +47,7 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 #' @param color_default Default (fill) color if color is not computed for the layer
 #' @param color_outline Fixed color of the outline of polygons
 #' @param toggle_reload Reactive to trigger a reload of the map. Sometimes necessary, such as in modals.
-#' @param layers List of reactives (each with a list of settings). See example apps.
+#' @param layers List of reactives (each with a list of settings). See example apps in test/
 #' @importFrom shiny renderPrint reactiveValuesToList isolate outputOptions
 #' @importFrom leaflet leaflet renderLeaflet leafletProxy clearGroup addPolygons fitBounds addCircleMarkers
 #' @importFrom leaflet addLegend removeControl setView addPolylines

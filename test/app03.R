@@ -1,5 +1,5 @@
 
-
+# shintomap example app 03
 
 # Example app with map in a modal, using softui::modalize,
 # and the code for the map (ui+server) in a shiny module.
@@ -7,17 +7,22 @@
 # the first time the modal is opened, but not the second time.
 # Map has to be reloaded every time the modal is triggered...
 
+# "Most of the time" a better solution is example app 03b. It has the same functionality
+# as this one, but puts the map in a 'ui modal', which means the map does not get reloaded
+# every time we click the button.
 
+# Dependencies
 library(shiny)
 library(softui)
 library(leaflet)
 
+# Load this package (or do library(shintomap))
 devtools::load_all()
 
-
+# Data (in git)
 geo <- readRDS("geo_Eindhoven.rds")
 
-
+# Module UI, to test operation inside a module (inside a module (inside a module))
 mymapui <- function(id){
   ns <- NS(id)
 
@@ -52,7 +57,7 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
              layers = list(
 
-               # Layer: gebouwen
+               # Layer: areas
                reactive(
 
                  list(
@@ -88,7 +93,7 @@ mymapserver <- function(input, output, session, map_data = reactive(NULL), ...){
 
 
 
-
+# Main shiny app
 ui <- softui::simple_page(
   softui::box(title = "shintomap", icon = bsicon("geo-alt-fill"), width = 6,
 
