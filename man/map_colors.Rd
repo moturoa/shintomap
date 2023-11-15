@@ -2,6 +2,8 @@
 % Please edit documentation in R/map_color_functions.R
 \name{binned_numeric_map_color}
 \alias{binned_numeric_map_color}
+\alias{factor_map_color}
+\alias{shinto_auto_color}
 \title{Returns a function to make colors from a numeric vector (n distinct values)}
 \usage{
 binned_numeric_map_color(
@@ -16,6 +18,20 @@ binned_numeric_map_color(
   na.color = grDevices::rgb(0, 0, 0, 0),
   ...
 )
+
+factor_map_color(
+  vals,
+  colors = NULL,
+  palette_function = "viridis",
+  reverse = FALSE,
+  color_other = "#D3D3D3",
+  na.color = grDevices::rgb(0, 0, 0, 0),
+  bins_predefined = NULL,
+  method = c("auto", "predefined"),
+  ...
+)
+
+shinto_auto_color(vals, ..., force_factor = FALSE)
 }
 \arguments{
 \item{vals}{A numeric vector}
@@ -29,4 +45,17 @@ cuts it in equal quantile parts (so that each bin contains ca. equal number of o
 }
 \description{
 Returns a function to make colors from a numeric vector (n distinct values)
+
+Map colors for a factor variable
+
+Map colors, auto
+}
+\examples{
+ vals <- runif(100,0,100)
+ bins <- c(0,10,25,50)
+ colors <- c("green","red","blue","black")
+
+ fun <- shinto_auto_color(vals, bins = bins, method = "predefined", colors = colors)
+
+ fun(vals)
 }

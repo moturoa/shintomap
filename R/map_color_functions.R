@@ -1,10 +1,15 @@
 
 
 #' Returns a function to make colors from a numeric vector (n distinct values)
+#' @description See [shintoMapModule()] on how to use this function inside a shintomap map module.
 #' @param vals A numeric vector
-#' @param palette_function A palette function from the `pals` package
+#' @param palette_function A palette function from the `pals` package ("kovesi.rainbow","parula")
+#' @param colors Optional, a vector of colors (then, colors are not taken from a palette function)
+#' @param reverse If TRUE, reverses the colors generated from the palette
 #' @param method If bin, cuts the numeric vector in equal parts. If quantile,
 #' cuts it in equal quantile parts (so that each bin contains ca. equal number of observations)
+#' @param pretty If TRUE, uses an internal prettyizing function for the bin breaks
+#' @param bins_predefined If provided (optional), do not make the bins but use these bins.
 #' @param na.color Color for NA values (default white)
 #' @export
 #' @rdname map_colors
@@ -91,6 +96,7 @@ get_pals_colors <- function(palette_function, n){
 
 
 #' Map colors for a factor variable
+#' @param color_other Color for bin not in bins_predefined
 #' @rdname map_colors
 #' @export
 factor_map_color <- function(vals,
@@ -139,6 +145,7 @@ factor_map_color <- function(vals,
 }
 
 #' Map colors, auto
+#' @param force_factor If TRUE, treats a numeric column as if it is a factor
 #' @rdname map_colors
 #' @export
 #' @examples
