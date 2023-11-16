@@ -121,6 +121,7 @@ server <- function(input, output, session) {
       lat = feature$geometry$coordinates[[2]],
       radius = feature$properties$radius
     )
+
     circle_point <- sf::st_sfc(sf::st_point(c(my_circle$lon,my_circle$lat))) %>%
       sf::st_set_crs(4326)
 

@@ -72,7 +72,7 @@ server <- function(input, output, session) {
              # In this example we have just one layer (so one reactive in the list)
              layers = list(
 
-               # Layer: gebouwen
+               # Layer: areas
                reactive(
 
                  # In this example all inputs are static, but any of these
@@ -89,7 +89,7 @@ server <- function(input, output, session) {
                    color_function = list(
                      palfunction = "shinto_auto_color",
                      palette_function = "parula",
-                     reverse = TRUE,
+                     reverse = FALSE,
                      opacity = 0.8
                    ),
                    legend = list(
