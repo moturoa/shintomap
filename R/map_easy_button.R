@@ -1,4 +1,8 @@
 #' Add buttons on map (topleft corner)
+#' @description See example apps for usage.
+#' @param id Id for the button (use session$ns("id") server-side)
+#' @param icon_file Name of the icon, including the extension (.png or whatever), see inst/icons for list of available icons
+#' @param label Label on hover (optional)
 #' @export
 #' @importFrom htmltools HTML
 #' @importFrom leaflet JS

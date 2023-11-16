@@ -17,6 +17,8 @@ addShintoMapLayers(
 
 \item{default}{Default selected layer}
 
+\item{position}{Position of the legend, 'topright', 'bottomleft', etc.}
+
 \item{openstreetmap_extend_zoom}{If TRUE, extends zoom in OpenStreetMap layer beyond native zoom,
 so we can zoom in further (with lower resolution). Useful for drawing on map.}
 

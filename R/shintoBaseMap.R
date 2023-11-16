@@ -1,5 +1,10 @@
 #' Makes a leaflet map for use in shintoMapModule
+#' @param set_view List with components `lng`, `lat` and `zoom` for initial view of the map
+#' @param fullscreen_option If TRUE, adds a fullscreen button (from leaflet.extras), slightly buggy sometimes
+#' @param layers_button_position Where to place the button for the layer options (default topright)
+#' @param ... Further arguments passed to [addShintoMapLayers()]
 #' @export
+#' @importFrom leaflet.extras addFullscreenControl
 shintoBaseMap <- function(set_view = NULL,
                           fullscreen_option = FALSE,
                           layers_button_position = "topright",
@@ -11,7 +16,7 @@ shintoBaseMap <- function(set_view = NULL,
 
   if(fullscreen_option){
     map <- map %>%
-      addFullscreenControl(pseudoFullscreen=TRUE)
+      leaflet.extras::addFullscreenControl(pseudoFullscreen=TRUE)
   }
 
   # Set the initial location

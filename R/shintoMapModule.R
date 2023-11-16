@@ -89,13 +89,16 @@ shintoMapUI <- function(id, debugger_panel = FALSE, ...){
 #' @param color_default Default (fill) color if color is not computed for the layer
 #' @param color_outline Fixed color of the outline of polygons
 #' @param toggle_reload Reactive to trigger a reload of the map. Sometimes necessary, such as in modals.
+#' @param proxy If TRUE (default), uses leafletProxy() to update the map. This is better for performance, but in
+#' some cases (for maps that are hidden), try using proxy = FALSE to avoid certain display bugs.
 #' @param layers List of reactives (each with a list of settings). See example apps in test/, and Details below
 #' @importFrom shiny renderPrint reactiveValuesToList isolate outputOptions
 #' @importFrom leaflet leaflet renderLeaflet leafletProxy clearGroup addPolygons fitBounds addCircleMarkers
 #' @importFrom leaflet addLegend removeControl setView addPolylines
 #' @importFrom sf st_bbox
-#' @importFrom shiny observe reactiveVal observeEvent
+#' @importFrom shiny observe reactiveVal observeEvent is.reactive req
 #' @importFrom leafgl addGlPoints
+#' @importFrom stats runif
 #' @export
 shintoMapModule <- function(input, output, session,
                       base_map,
@@ -139,7 +142,7 @@ shintoMapModule <- function(input, output, session,
     map <- base_map
 
     # Border
-    req(border())
+    shiny::req(border())
     border_data <- shiny::isolate(border())
 
     if(!is.null(border_data)){
@@ -156,7 +159,7 @@ shintoMapModule <- function(input, output, session,
 
     }
 
-    ui_ping(runif(1))
+    ui_ping(stats::runif(1))
 
 
     if(!proxy){
@@ -242,7 +245,7 @@ shintoMapModule <- function(input, output, session,
           lay$color_outline <- color_outline
         }
 
-        if(is.reactive(label_function)){
+        if(shiny::is.reactive(label_function)){
           label_function <- label_function()
         }
 

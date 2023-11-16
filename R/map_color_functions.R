@@ -3,14 +3,16 @@
 #' Returns a function to make colors from a numeric vector (n distinct values)
 #' @description See [shintoMapModule()] on how to use this function inside a shintomap map module.
 #' @param vals A numeric vector
+#' @param n Number of colors to generate (in binned_numeric_map_color)
 #' @param palette_function A palette function from the `pals` package ("kovesi.rainbow","parula")
 #' @param colors Optional, a vector of colors (then, colors are not taken from a palette function)
 #' @param reverse If TRUE, reverses the colors generated from the palette
 #' @param method If bin, cuts the numeric vector in equal parts. If quantile,
 #' cuts it in equal quantile parts (so that each bin contains ca. equal number of observations)
 #' @param pretty If TRUE, uses an internal prettyizing function for the bin breaks
-#' @param bins_predefined If provided (optional), do not make the bins but use these bins.
+#' @param bins_predefined If provided (optional), do not make the bins but use these bins. See wbm3.0 for usage.
 #' @param na.color Color for NA values (default white)
+#' @param ... Further args passed from shinto_auto_color to binned_numeric_map_color or factor_map_color
 #' @export
 #' @rdname map_colors
 #' @importFrom leaflet colorBin colorQuantile

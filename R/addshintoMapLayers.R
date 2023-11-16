@@ -3,12 +3,13 @@
 #' Kadaster map (overlayed over standaard NL with transparency), PDOK arial photos (RGB, IR)
 #' @param map A Leaflet map object
 #' @param default Default selected layer
+#' @param position Position of the legend, 'topright', 'bottomleft', etc.
 #' @param openstreetmap_extend_zoom If TRUE, extends zoom in OpenStreetMap layer beyond native zoom,
 #' so we can zoom in further (with lower resolution). Useful for drawing on map.
 #' @param kadaster_opacity Opacity of the kadaster map overlayed over the Standaard NL map. If you don't want to
 #' see the standaard NL map, set opacity to 1.0.
 #' @export
-#' @importFrom leaflet addProviderTiles addTiles addWMSTiles WMSTileOptions addLayersControl
+#' @importFrom leaflet addProviderTiles addTiles addWMSTiles WMSTileOptions addLayersControl providerTileOptions
 addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas",
                                position = "topright",
                                openstreetmap_extend_zoom = FALSE,
@@ -41,7 +42,7 @@ addShintoMapLayers <- function(map, default = "Esri.WorldGrayCanvas",
     if(names(tiles[i]) == "OpenStreetMap" & openstreetmap_extend_zoom){
       map <- map %>%
         leaflet::addProviderTiles(unname(tiles[i]), group = names(tiles[i]),
-                                  options = providerTileOptions(maxNativeZoom = 18, maxZoom = 22)) #
+                                  options = leaflet::providerTileOptions(maxNativeZoom = 18, maxZoom = 22)) #
     } else {
       map <- map %>%
         leaflet::addProviderTiles(unname(tiles[i]), group = names(tiles[i]))

@@ -36,19 +36,31 @@ shinto_auto_color(vals, ..., force_factor = FALSE)
 \arguments{
 \item{vals}{A numeric vector}
 
-\item{palette_function}{A palette function from the \code{pals} package}
+\item{n}{Number of colors to generate (in binned_numeric_map_color)}
+
+\item{palette_function}{A palette function from the \code{pals} package ("kovesi.rainbow","parula")}
+
+\item{colors}{Optional, a vector of colors (then, colors are not taken from a palette function)}
+
+\item{reverse}{If TRUE, reverses the colors generated from the palette}
 
 \item{method}{If bin, cuts the numeric vector in equal parts. If quantile,
 cuts it in equal quantile parts (so that each bin contains ca. equal number of observations)}
 
+\item{pretty}{If TRUE, uses an internal prettyizing function for the bin breaks}
+
+\item{bins_predefined}{If provided (optional), do not make the bins but use these bins. See wbm3.0 for usage.}
+
 \item{na.color}{Color for NA values (default white)}
+
+\item{...}{Further args passed from shinto_auto_color to binned_numeric_map_color or factor_map_color}
+
+\item{color_other}{Color for bin not in bins_predefined}
+
+\item{force_factor}{If TRUE, treats a numeric column as if it is a factor}
 }
 \description{
-Returns a function to make colors from a numeric vector (n distinct values)
-
-Map colors for a factor variable
-
-Map colors, auto
+See \code{\link[=shintoMapModule]{shintoMapModule()}} on how to use this function inside a shintomap map module.
 }
 \examples{
  vals <- runif(100,0,100)

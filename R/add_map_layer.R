@@ -1,6 +1,8 @@
 
 #- internal function used in shintoMapModule to add an actual polygon/point layer to a leaflet map
 
+#' @importFrom utils hasName
+#' @importFrom leaflet markerClusterOptions labelOptions
 add_map_layer <- function(map, lay, color_default, color_outline, label_function){
 
   lay <- validate_map_layer(lay)
@@ -12,7 +14,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
   }
 
 
-  if(is.reactive(lay$data)){
+  if(shiny::is.reactive(lay$data)){
     stop("reactive passed inside config for shintomap::add_map_layer")
   }
 
@@ -45,7 +47,7 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
       opt <- lay$color_function[-1]
 
       # The provided column is not present in the data (fallback colors + warning)
-      if(!hasName(lay$data, lay$color_column)){
+      if(!utils::hasName(lay$data, lay$color_column)){
 
         warning(paste("Color column", lay$color_column, "not found in data, using default color"))
         lay$data$FILL_COLOR <- color_default
@@ -91,13 +93,13 @@ add_map_layer <- function(map, lay, color_default, color_outline, label_function
             }
 
           } else {
-            clus <- do.call(markerClusterOptions, lay$clustering)
+            clus <- do.call(leaflet::markerClusterOptions, lay$clustering)
           }
 
         }
 
         if(isTRUE(lay$label_fixed)){
-          lab_options <-  labelOptions(noHide = TRUE, textsize = 10, textOnly = TRUE)
+          lab_options <-  leaflet::labelOptions(noHide = TRUE, textsize = 10, textOnly = TRUE)
         } else {
           lab_options <- NULL
         }

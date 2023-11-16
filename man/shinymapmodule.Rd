@@ -63,6 +63,9 @@ the modal is opened)}
 
 \item{toggle_reload}{Reactive to trigger a reload of the map. Sometimes necessary, such as in modals.}
 
+\item{proxy}{If TRUE (default), uses leafletProxy() to update the map. This is better for performance, but in
+some cases (for maps that are hidden), try using proxy = FALSE to avoid certain display bugs.}
+
 \item{layers}{List of reactives (each with a list of settings). See example apps in test/, and Details below}
 }
 \description{

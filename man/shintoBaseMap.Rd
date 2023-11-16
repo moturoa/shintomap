@@ -11,6 +11,15 @@ shintoBaseMap(
   ...
 )
 }
+\arguments{
+\item{set_view}{List with components \code{lng}, \code{lat} and \code{zoom} for initial view of the map}
+
+\item{fullscreen_option}{If TRUE, adds a fullscreen button (from leaflet.extras), slightly buggy sometimes}
+
+\item{layers_button_position}{Where to place the button for the layer options (default topright)}
+
+\item{...}{Further arguments passed to \code{\link[=addShintoMapLayers]{addShintoMapLayers()}}}
+}
 \description{
 Makes a leaflet map for use in shintoMapModule
 }

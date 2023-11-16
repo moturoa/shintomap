@@ -6,6 +6,13 @@
 \usage{
 map_easy_button(id, icon_file, label)
 }
+\arguments{
+\item{id}{Id for the button (use session$ns("id") server-side)}
+
+\item{icon_file}{Name of the icon, including the extension (.png or whatever), see inst/icons for list of available icons}
+
+\item{label}{Label on hover (optional)}
+}
 \description{
-Add buttons on map (topleft corner)
+See example apps for usage.
 }

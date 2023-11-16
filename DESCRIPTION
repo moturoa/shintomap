@@ -1,14 +1,14 @@
 Package: shintomap
 Type: Package
 Title: Shinto Maps
-Version: 0.5.3
+Version: 0.5.4
 Author: Remko Duursma
 Maintainer: Remko Duursma <remko@shintolabs.nl>
 Description: Standard interactive Shinto map based on leaflet. Replaces
     old 'leafletModule'. Make anything interactive. Add multiple layers.
     Color by attributes, automatic legends.
 Depends: magrittr
-Imports: leaflet, htmltools, shiny, leafgl, glue, stats
+Imports: leaflet, htmltools, shiny, leafgl, glue, stats, sf, utils, leaflet.extras
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
